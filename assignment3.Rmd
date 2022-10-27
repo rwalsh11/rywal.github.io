@@ -1,0 +1,278 @@
+
+---
+output: # rmarkdown::github_document
+  html_document:
+  pdf_document: default
+  word_document: default
+title: "Assignment 3.  Working with Data Frame. Base R Style"
+---
+
+***Note*:** *This assignment practices working with Data Frame using Base R.*
+
+***How to do it?***: 
+
+- Open the Rmarkdown file of this assignment ([link](assignment3.Rmd)) in Rstudio. 
+
+- Right under each question, insert  a code chunk (you can use the hotkey `Ctrl + Alt + I` to add a code chunk) and code the solution for the question. 
+
+- `Knit` the rmarkdown file (hotkey: `Ctrl + Alt + K`) to export an html.  
+
+-  Publish the html file to your Githiub Page. 
+
+***Submission***: Submit the link on Github of the assignment to Canvas under Assignment 3. 
+
+-------
+
+Problems
+-------
+ \
+
+1. Create the following data frame
+
+| Rank 	| Age 	| Name  	|
+|:------	|:-----	|:-------	|
+| 0    	| 28  	| Tom   	|
+| 1    	| 34  	| Jack  	|
+| 2    	| 29  	| Steve 	|
+| 3    	| 42  	| Ricky 	|
+
+```{r}
+data.frame(Rank = c("0","1","2","3"),Age = c("28","34","29","42"), Name = c("Tom","Jack","Steve","Ricky"))
+```
+
+
+2. Use `read.csv` to import the Covid19 Vaccination data from WHO: [link](https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv).
+```{r}
+covid <- read.csv('https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv')
+
+```
+
+2. Show the names of the variables in the data
+```{r}
+names(covid)
+```
+
+
+3. How many columns and rows the data have? 
+```{r}
+
+ncol(covid)
+nrow(covid)
+
+```
+```{r}
+
+```
+
+4. How many missing values are there?  Show the missing values by columns.  What variable has the most number of missing values?
+```{r}
+sum(is.na(covid))
+```
+```{r}
+colSums(is.na(covid))
+```
+
+
+5. What is the class of the `date` column. Change the `date` columns to `date` type using the `as.Date` function. Show the new class of the `date` column. 
+```{r}
+class(covid$date)
+names(covid)[1] <- 'Date_report'
+covid$Date_report <-as.Date(covid$Date_report)
+class(covid$Date_report)
+```
+
+
+6. Capitalize the names of all the variables
+```{r}
+names(covid)[1] <- 'Date_Report'
+names(covid)[2] <- 'State'
+names(covid)[3] <- 'Flips'
+names(covid)[4] <- 'Cases'
+names(covid)[5] <- 'Deaths'
+```
+
+
+7. Find the average number of cases per day. Find the maximum cases a day.  
+```{r}
+#average number of cases per day
+df1 <-  aggregate(Cases~Date_Report,covid,mean)
+#maximum cases 
+df2 <- df1[order(-df1$Cases),]
+head(df2, n=10)
+```
+
+8. How many states are there in the data?  
+
+```{r}
+
+sum(table(unique.default(covid$State)))
+
+```
+
+9. Create a new variable `weekdays` to store the weekday for each rows. 
+```{r}
+
+covid$weekdays <- weekdays.Date(covid$Date_Report)
+```
+
+10. Create the categorical variable `death2` variable taking the values as follows
+
+- `has_death` if there is a death that day
+-  `no_death` if there is no death that day
+Find the frequency and relative frequency of `no_death` and `has_death`. 
+
+```{r}
+
+covid$death2 <- ifelse(covid$Deaths==0, 
+                        'has_death','no_death')
+table(covid$death2)
+prop.table(table(covid$death2))
+
+```
+
+
+
+11. Find the first quartile (Q1), second quartile (Q2) and and third quartile (Q3) of the variable `death`. (Hint:  Use the `summary` function)
+
+```{r}
+summary(covid$Deaths)
+```
+
+
+12. Create the categorical variable `death3` variable taking the values as follows
+
+- `low_death` if the number of deaths smaller than the 25 percentile (Q1)
+
+- `mid_death` if the number of deaths from Q1 to Q3
+
+- `high_death` if the number of deaths greater than Q3
+
+```{r}
+library(dplyr)
+covid$death3 <- case_when(covid$Deaths<839 ~ 'low_death',
+                             covid$Deaths<12680 ~ 'mid_death',
+                             TRUE~'high_death')
+table(covid$death3)
+```
+
+
+13. Find the average cases in Rhode Island in 2021
+```{r}
+by(covid$Deaths, covid$State == "Rhode Island", FUN = mean)
+```
+
+
+14. Find the median cases by weekdays in Rhode Island in 2021 
+```{r}
+covid$weekdays <- weekdays(covid$Date_Report)
+df1 = covid[covid$State=='Rhode Island',]
+by(df1$Deaths,df1$weekdays, median)
+```
+
+
+15. Compare the median cases in Rhode Island in June, July, August and September in 2021. 
+
+```{r}
+library(lubridate)
+covid$Date_Report <- as.Date(covid$Date_Report)
+covid$month <- month(covid$Date_Report, label = TRUE)
+q15 <- case_when(covid$Date_Report %in% c('june') ~ 'june',
+                       covid$month %in% c('july') ~ 'july',covid$month %in% c('august') ~ 'august',covid$month %in% c('september') ~ 'september',
+                       TRUE~'other_months')
+
+df1 = covid[covid$State=='Rhode Island',]
+by(df1$Deaths,df1$month == "june", median)
+by(df1$Deaths,df1$month == "july", median)
+by(df1$Deaths,df1$month == "august", median)
+by(df1$Deaths,df1$month == "september", median)
+```
+
+16.  Find your own dataset, import it and implement the following functions on the data
+
+- head
+```{r}
+df <- read.csv('titanic.csv')
+head(df$Survived)
+```
+
+- str
+```{r}
+str(df)
+```
+
+- names
+```{r}
+names(df)
+```
+
+- mean, min, max
+```{r}
+summary(df$Survived)
+```
+
+- table
+```{r}
+table(df$Survived)
+```
+
+- is.na
+```{r}
+table(is.na(df))
+```
+
+- colSums
+```{r}
+colSums(is.na(df))
+```
+
+- class
+```{r}
+class(df)
+```
+
+- cor
+```{r}
+cor(df$PassengerId,df$Survived)
+```
+
+- by
+```{r}
+by(df$Ticket, df$Survived, FUN = mean)
+```
+
+- ifelse
+```{r}
+df$Sex <- ifelse(df$Sex=="male", 
+                        '0','1')
+```
+
+- case_when
+```{r}
+df$Survived <- case_when(df$Survived==0 ~ 'No_new_cases', 
+                            TRUE ~ 'Has_new_cases')
+```
+
+17.  In the dataset in #16, practice the follows.  You can reuse the code of 16. 
+
+- Create a categorical variable from a continuous variable
+```{r}
+df$age2 <- case_when(df$Age<25 ~ 'young',
+                             df$Age<55 ~ 'average',
+                             TRUE~'old')
+table(df$age2)
+```
+
+- From one categorical variable, create a new categorical variable with fewer categories
+
+```{r}
+
+
+
+df$month2 <- case_when(df$SibSp %in% c("0") ~ 'no sib/spouse',
+                       df$SibSp %in% c("1","2") ~ 'average siblings/spouses',TRUE ~ 'lots of siblings/ spouses')
+                  
+
+```
+
+
+If you do not have a data, you can use [the titanic dataset](https://www.kaggle.com/competitions/titanic/overview), which can be downloaded at [this link](../data/titanic.csv)

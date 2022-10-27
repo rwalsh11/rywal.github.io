@@ -1,0 +1,92 @@
+---
+title: "Assigment 3 extra data set"
+author: "Ryan Walsh"
+date: "2022-09-16"
+output: html_document
+---
+```{r}
+df <- read.csv('C:/Users/student/Desktop/R Math421/rwalsh11.github.io/adult_census.csv')
+```
+#Head
+```{r}
+head(df$education)
+```
+
+#str
+```{r}
+str(df$marital.status)
+```
+
+#names
+```{r}
+names(df)
+```
+
+#min, max, mean
+```{r}
+summary(df)
+```
+
+#table
+```{r}
+table(df$workclass)
+```
+
+#is.na & colSums
+```{r}
+colSums(is.na(df))
+
+```
+
+
+
+#class
+```{r}
+class(df$age)
+class(df$native.country)
+```
+
+#cor
+```{r}
+cor(df$age,df$capital.gain)
+```
+
+#by
+```{r}
+by(df$hours.per.week, df$age >= 55, FUN = mean)
+```
+
+
+#ifelse
+```{r}
+df$sex <- ifelse(df$sex=="male", 
+                        '0','1')
+```
+
+#case when
+```{r}
+library(tidyverse)
+library(dplyr)
+df$sex2 <- case_when(df$sex == 1 ~ "man", TRUE ~ "woman")
+table(df$sex2)
+
+```
+
+#Create a categorical variable from a continuous 
+```{r}
+summary(df$hours.per.week)
+df$hours.per.week2 <- case_when(df$hours.per.week<35 ~ 'part time',
+                             df$hours.per.week<41 ~ 'average full time',
+                             TRUE~'full time+')
+table(df$hours.per.week2)
+```
+
+
+#From one categorical variable, create a new categorical variable with fewer categories
+```{r}
+table(df$race)
+df$race2 <- case_when(df$race %in% c("Amer-Indian_Eskimo","Asian-Pac-islander","Black","Other") ~ 'non-white',
+                       TRUE ~ 'white')
+table(df$race2)
+```
+
