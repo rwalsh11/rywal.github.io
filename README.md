@@ -1,4 +1,5 @@
 # rywal.github.io
+
 | assignments | extra credits | Plots/downloads |
 |:---:|:---:|:---:|
 | [Click for Assignment 1](Assignment-1.html) |  |  |
