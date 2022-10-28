@@ -138,7 +138,7 @@ df1 %>% arrange(-tot) %>% filter(sex == 1)
 ```
 9. Which month has the most number of teenage female patients?
 ```{r}
-df1 %>% arrange(-moa) %>% filter(sex == 2, age <= 18)
+df1 %>% arrange(-moa) %>% filter(sex == 2, age < 20)
 ```
 10. Which provider has the most number of female patients in October? 
 ```{r}
@@ -194,6 +194,57 @@ df1 %>% ggplot(aes(x = moa,
   geom_point()
   labs(title = 'moa: {closest_state}')
 ```
+
+```{r}
+df1 %>% ggplot(aes(x = moa,
+           y = trandb, color=sex))+
+  geom_point()
+  labs(title = 'moa: {closest_state}')
+```
+
+```{r}
+df1 %>% ggplot(aes(x = mod,
+           y = trandb, color=sex))+
+  geom_point()
+  labs(title = 'moa: {closest_state}')
+```
+
+```{r}
+df1 %>% ggplot(aes(x = age,
+           y = trandb, color=sex))+
+  geom_point()
+  labs(title = 'age by expense')
+```
+
+```{r}
+df1 %>% ggplot(aes(x = provider,
+           y = trandb, color=sex))+
+  geom_point()
+  labs(title = 'provider by expense by gender')
+```
+
+```{r}
+df1 %>% ggplot(aes(x = moa,
+           y = trandb, color=sex))+
+  geom_point()
+  labs(title = 'moa: {closest_state}')
+```
+
+```{r}
+df1 %>% ggplot(aes(x = admtype,
+           y = tot, color=sex))+
+  geom_point()
+  labs(title = 'total expenses by admin type')
+```
+
+```{r}
+
+df1 %>% ggplot(aes(x = tot,
+           y = los, color=sex))+
+  geom_point()
+  labs(title = 'tot by los')
+```
+
 2. Make an animation plot. 
 ```{r}
 library(gganimate)
@@ -203,10 +254,20 @@ library(lubridate)
 plot1 <- df1 %>% filter(season %in% c('fall','summer','spring','winter')) %>% 
   ggplot(aes(y=trandb,
             x=los,
-            color=season))+ 
-  geom_point()
+            color=sex))+ 
+  transition_states(season)+
+  labs(title = 'sex: {closest_state}')
 plot1
 ```
+
+```{r}
+df1 %>% ggplot(aes(x = los,
+           y = trandb))+
+  geom_point()+
+  transition_states(sex)+
+  labs(title = 'sex: {closest_state}')
+```
+
 3. Write a paragraph to summarize the section and give your comments on the results. 
 
 -------
