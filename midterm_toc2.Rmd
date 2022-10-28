@@ -249,6 +249,7 @@ df2 <- df1 %>% select(age,sex,raceethn,provider,moa,mod,admtype,campus, los,targ
 library(caret)
 set.seed(2020)
 df2 <- df2 %>% filter(!raceethn == "")
+df2 <- drop_na(df2)
                                             
 splitIndex <- createDataPartition(df2$target, p = .10, 
                                   list = FALSE)
@@ -289,8 +290,8 @@ library(caret)
 tuneGrid = expand.grid(mtry = 2:4,
                        splitrule = c('gini'),
                        min.node.size = c(1:10))
+
 trControl = trainControl(method = "cv",
-                         
                          number = 5)
 
 tree_approach3 <- train(target~., data=df_train, 
@@ -299,51 +300,54 @@ tree_approach3 <- train(target~., data=df_train,
                                 tuneGrid = tuneGrid)
 
 ```
-
-
 4. Plot the comparison of the models in 3. 
 ```{r}
 plot(tree_approach2)
 print(tree_approach2)
 pred <- predict(tree_approach2, df_test)
-#cm0 <- confusionMatrix(data = pred, reference = df_test$target)
-#cm0$overall[1]
+cm0 <- confusionMatrix(data = pred, reference = df_test$target)
+cm0$overall[1]
 ```
 
 ```{r}
 plot(tree_approach3)
 print(tree_approach3)
 pred <- predict(tree_approach3, df_test)
-#cm1 <- confusionMatrix(data = pred, reference = df_test$target)
-#cm1$overall[1]
+cm1 <- confusionMatrix(data = pred, reference = df_test$target)
+cm1$overall[1]
 ```
 
 5. What is your final selection for the model? Test the accuracy of your final model on the test data. 
 
 6. Create another `target` variable (binary), decide the input variables and redo 1 to 5. 
+
 ```{r}
 df1 <- df1 %>% rename(target1=los)#new target(have not established anything else)
 
 df1 <- df1 %>% 
   mutate(target1 = as.factor(target1),)
 df2 <- df1 %>% select(age,sex,raceethn,provider,moa,mod,admtype,campus, target1,target)
+```
+
+
+```{r}
 library(caret)
 set.seed(2020) 
-df2 <- (df2 %>%  select(raceethn) %>% filter(-raceethn=='') ) 
-#splitIndex <- createDataPartition(df2$target1, p = .10, 
-                                  #list = FALSE)
-#df_train <- df2[ splitIndex,]
-#df_test <- df2[-splitIndex,]
+df2 <- df2 %>% filter(!raceethn=='') 
+splitIndex <- createDataPartition(df2$target1, p = .10, 
+                                  list = FALSE)
+df_train <- df2[ splitIndex,]
+df_test <- df2[-splitIndex,]
 
-#tuneGrid = expand.grid(maxdepth = 2:10)
+tuneGrid = expand.grid(maxdepth = 2:10)
 
-#trControl = trainControl(method = "cv",
-                         #number = 5)
+trControl = trainControl(method = "cv",
+                         number = 5)
 
-#tree_approach2 <- train(target~., data=df_train, 
-                                #method = "rpart2", 
-                                #trControl = trControl,
-                                #tuneGrid = tuneGrid)
+tree_approach2 <- train(target~., data=df_train, 
+                                method = "rpart2", 
+                                trControl = trControl,
+                                tuneGrid = tuneGrid)
 ```
 7. Write a paragraph to summarize the section and give your comments on the results. 
 
