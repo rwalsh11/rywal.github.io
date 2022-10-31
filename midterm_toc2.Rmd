@@ -217,91 +217,92 @@ df1 %>% filter(dispub92 %in% c("01","02","03","04","05","09","20","50","51","62"
 ```
 
 ```{r}
-df1 %>% ggplot(aes(x = moa,
-           y = trandb, color=sex1))+
-  geom_point()+
-  labs(title = 'moa: {closest_state}')
+library(ggplot2)
+df1 %>% ggplot() + geom_point(mapping=aes(x=age, y=los)) + facet_wrap(~sex1) +
+  labs(x='Age', 
+       y = 'Length of Stay', 
+       title = 'Length of Stay by Age and Sex', 
+       caption = '')
+
 ```
 
 ```{r}
-df1 %>% ggplot(aes(x = mod,
-           y = trandb, color=sex1))+
-  geom_point()+
-  labs(title = 'moa: {closest_state}')
+df1 %>% ggplot() + geom_point(mapping=aes(x=age, y=tot)) + facet_wrap(~sex1) +
+  labs(x='Age', 
+       y = 'total expenses', 
+       title = 'Length of Stay by Age and total expenses', 
+       caption = '')
 ```
 
 ```{r}
-df1 %>% ggplot(aes(x = age,
-           y = tot, color=sex1))+
-  geom_point()+
-  labs(title = 'age by expense')
+library(ggplot2)
+df1 %>% ggplot() + geom_point(mapping=aes(x=los, y=tot)) + facet_wrap(~provider1) +
+  labs(x='Length of Stay', 
+       y = 'Total Charge', 
+       title = 'Total Charge by Length of Stay and Provider', 
+       caption = '')
 ```
 
 ```{r}
-df1 %>% ggplot(aes(x = provider,
-           y = tot, color=sex1))+
-  geom_point()+
+#teenagers
+df1 %>% filter(age <= 20) %>% ggplot(aes(y = provider1,
+           x = tot, color=sex1))+
+  geom_col()+
   labs(title = 'provider by expense by gender')
 ```
 
 ```{r}
-df1 %>% ggplot(aes(x = moa,
-           y = trandb, color=sex1))+
-  geom_point()+
+df1 %>% ggplot(aes(x = moa,y= tot,
+            color=sex1))+
+  geom_col()+
   labs(title = 'moa vs total room and board')
 ```
 
 ```{r}
-df1 %>% ggplot(aes(x = admtype,
+df1 %>% ggplot(aes(x = campus,
            y = tot, color=sex1))+
-  geom_point()+
+  geom_col()+
   labs(title = 'total expenses by admin type')
 ```
 
 ```{r}
 
-df1 %>% ggplot(aes(x = tot,
-           y = los, color=sex1))+
-  geom_point()+
-  labs(title = 'tot by los')
+df1 %>% ggplot() + geom_point(mapping=aes(x=los, y=tot, color = sex1)) + facet_wrap(~provider1) +
+  labs(x='Length of Stay', 
+       y = 'Total Charge', 
+       title = 'Total Charge by Length of Stay and Provider', 
+       caption = '')
 ```
 
-```{r, eval=FALSE}
+
+```{r}
 df1 %>% filter(pt_state %in% c("MA", "RI", "CT")) %>% 
-ggplot(aes(x = pt_state,
-           y = tot))+
-  geom_bar()+
-  labs(title = 'pysical therapy in MA, CT, RI vs total cost')
+ggplot(aes(x = pt_state,y = tot
+           ))+
+  geom_col()+
+  labs(title = 'pysical therapy in MA, CT, RI')
 ```
 
 ```{r}
-df1 %>%   ggplot(aes(x = preopday,
-           y = tot, color=sex1))+
-  geom_point()+
-  labs(title = 'preoperation length of stay vs total cost')
+df1 %>% ggplot() + geom_col(mapping=aes(y=provider1,x = tot, fill=season)) +
+  labs(x='Total Expenses', 
+       y='Provider',
+       fill = 'Season', 
+       title = '', 
+       caption = '')
 ```
 
 2. Make an animation plot. 
+
 ```{r}
 library(gganimate)
 library(ggplot2)
 library(tidyverse)
-library(lubridate)
-plot1 <- df1 %>% filter(season %in% c('fall','summer','spring','winter')) %>% 
-  ggplot(aes(y=trandb,
-            x=los,
-            color=sex))+ 
-  transition_states(season)+
-  labs(title = 'sex: {closest_state}')
-plot1
-```
-
-```{r}
-df1 %>% ggplot(aes(x = los,
-           y = trandb))+
-  geom_point()+
-  transition_states(sex)+
-  labs(title = 'sex: {closest_state}')
+df1 %>% ggplot() + geom_bar(mapping = aes(x = sex, fill = trandb)) + 
+  transition_states(age) + 
+  labs(x='Sex', 
+       y='Total room and board charge',
+       title = 'Age: {closest_state}')
 
 ```
 
