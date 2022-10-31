@@ -123,8 +123,14 @@ colSums(is.na(df1))
 ```
 6. Remove all variables with missing values. 
 ```{r}
-df1 %>% select(-nicu_day,-er_mode,-obs_chrg,-ecodub92,-payfix)
+df1 %>% select(-nicu_day,-er_mode,-obs_hour,-ecodub92,-payfix,-diag_adm,-bwght,-preopday)
 ```
+
+data wrangling to  better view providers
+```{r}
+df1$provider1 <- case_when(df1$provider == 7201 ~ "Newport", df1$provider == 7202 ~ "St. Joseph Health Services of RI",df1$provider == 7203 ~ "Memorial",df1$provider == 7204 ~ "Miriam",df1$provider == 7205 ~ "Rhode Island Hospital",df1$provider == 7206 ~ "Roger Williams",df1$provider == 7209 ~ "South County",df1$provider == 7210 ~ "Kent County",df1$provider == 7211 ~ "Westerly",df1$provider == 7212 ~ "Rehab of RI",df1$provider == 7213 ~ "Landmark Medical Center",df1$provider == 7214 ~ "Women and Infants",df1$provider == 7215 ~ "Bradley",df1$provider == 7216 ~ "Butler",)
+```
+
 7. Refer to the data description in the file `HDD2015-18cy6-20-19.docx`, which variable recording the month of admission?, which variable recording the month of discharge?
 ```{r}
 table(df1$moa)
@@ -134,16 +140,25 @@ table(df1$mod)
 
 8. Which month admitted the most number of patients? Which month admitted the most number of male patients?
 ```{r}
-df1 %>% arrange(-tot) %>% filter(sex == 1)
+table(df1$moa)
+q8 <-  df1 %>%  filter(sex == 1)
+table(q8$moa)
 ```
+The males make up for about half of all admissions, month 10, October appears to be the month with the most admitted patients both with respect to everyone and with respect to just men. 
+
 9. Which month has the most number of teenage female patients?
 ```{r}
-df1 %>% arrange(-moa) %>% filter(sex == 2, age < 20)
+q9 <- df1 %>% filter(sex == 2, age < 20)
+table(q9$moa) #month 5 is best
 ```
 10. Which provider has the most number of female patients in October? 
 ```{r}
-df1 %>% group_by(sex == 2,moa ==10) 
+table(df1$provider)
+q10 <- df1 %>% filter(sex == 2,moa ==10) 
+table(q10$provider)
 ```
+provider number 7205(rhode island hopsital) has the most ammount of female patients in october. 
+
 11. Are female patients older than male patients, on average? 
 ```{r}
 d1 <- df1 %>% group_by(sex == 1) %>% summarise(mean = mean(age))
@@ -158,13 +173,14 @@ d3
 ```
 13. What is the name of the provider that has the highest total charge?
 ```{r}
-d4 <- df1 %>% group_by(provider) 
-head(d4, n = 10)
+q13 <- df1 %>% group_by(provider) %>% summarise(max =max(tot))
+q13
+max(q13) #Woman and infants 
 ```
 14. What is the name of the provider that has the least total charge for teenage male on average?
 ```{r}
-df1$trandb <- as.numeric(df1$trandb)
-df1 %>% filter(sex == 1) %>%  group_by(provider) %>% summarise(mean = mean(trandb))
+df1$total <- as.numeric(df1$total)
+df1 %>% filter(sex == 1) %>%  group_by(provider1) %>% summarise(mean = mean(total))
 ```
 15. Create a season (Spring, Summer, Fall, Winter) variable. Calculate the length of stays by season.  Which season has the longest length of stays on average?
 ```{r}
@@ -177,7 +193,8 @@ df1 %>% group_by(season) %>% summarise(mean = mean(los))
 16. On average, how much a 20 year-old male get charged for staying 1 day in the Fall season?
 ```{r}
 
-df1 %>% filter(sex == 1, los == 1, age == 20, season == "fall")
+q16 <- df1 %>% filter(sex == 1, los == 1, age == 20, season == "fall") 
+q16 %>% summarise(mean = mean(tot))
 ```
 17. Write a paragraph to summarize the section and give your comments on the results. You could do some other calculations to support your points. 
 
@@ -188,61 +205,80 @@ df1 %>% filter(sex == 1, los == 1, age == 20, season == "fall")
 Continue with the data from part I. 
 
 1. Provides at least 10 meaningful plots. Comments on the plots. All plots should have title, caption, appropriate labels on x and y-axis
-```{r, eval=FALSE}
-df1 %>% ggplot(aes(x = moa,
-           y = tot, color=sex))+
-  geom_point()
-  labs(title = 'moa: {closest_state}')
+```{r}
+df1$sex1 <- case_when(df1$sex == 1 ~ 'male',df1$sex == 2 ~ 'female', df1$sex == 9 ~'Other')
+```
+
+
+```{r}
+df1 %>% filter(dispub92 %in% c("01","02","03","04","05","09","20","50","51","62","65","70")) %>% ggplot(aes(x = dispub92, color = sex1))+
+  geom_bar()+
+  labs(title = 'Bar graph of frequency of discharges stratified by sex')
 ```
 
 ```{r}
 df1 %>% ggplot(aes(x = moa,
-           y = trandb, color=sex))+
-  geom_point()
+           y = trandb, color=sex1))+
+  geom_point()+
   labs(title = 'moa: {closest_state}')
 ```
 
 ```{r}
 df1 %>% ggplot(aes(x = mod,
-           y = trandb, color=sex))+
-  geom_point()
+           y = trandb, color=sex1))+
+  geom_point()+
   labs(title = 'moa: {closest_state}')
 ```
 
 ```{r}
 df1 %>% ggplot(aes(x = age,
-           y = trandb, color=sex))+
-  geom_point()
+           y = tot, color=sex1))+
+  geom_point()+
   labs(title = 'age by expense')
 ```
 
 ```{r}
 df1 %>% ggplot(aes(x = provider,
-           y = trandb, color=sex))+
-  geom_point()
+           y = tot, color=sex1))+
+  geom_point()+
   labs(title = 'provider by expense by gender')
 ```
 
 ```{r}
 df1 %>% ggplot(aes(x = moa,
-           y = trandb, color=sex))+
-  geom_point()
-  labs(title = 'moa: {closest_state}')
+           y = trandb, color=sex1))+
+  geom_point()+
+  labs(title = 'moa vs total room and board')
 ```
 
 ```{r}
 df1 %>% ggplot(aes(x = admtype,
-           y = tot, color=sex))+
-  geom_point()
+           y = tot, color=sex1))+
+  geom_point()+
   labs(title = 'total expenses by admin type')
 ```
 
 ```{r}
 
 df1 %>% ggplot(aes(x = tot,
-           y = los, color=sex))+
-  geom_point()
+           y = los, color=sex1))+
+  geom_point()+
   labs(title = 'tot by los')
+```
+
+```{r, eval=FALSE}
+df1 %>% filter(pt_state %in% c("MA", "RI", "CT")) %>% 
+ggplot(aes(x = pt_state,
+           y = tot))+
+  geom_bar()+
+  labs(title = 'pysical therapy in MA, CT, RI vs total cost')
+```
+
+```{r}
+df1 %>%   ggplot(aes(x = preopday,
+           y = tot, color=sex1))+
+  geom_point()+
+  labs(title = 'preoperation length of stay vs total cost')
 ```
 
 2. Make an animation plot. 
@@ -266,7 +302,13 @@ df1 %>% ggplot(aes(x = los,
   geom_point()+
   transition_states(sex)+
   labs(title = 'sex: {closest_state}')
+
 ```
+
+
+
+
+
 
 3. Write a paragraph to summarize the section and give your comments on the results. 
 
