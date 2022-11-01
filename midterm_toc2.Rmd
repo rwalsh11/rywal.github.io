@@ -193,10 +193,13 @@ df1 %>% group_by(season) %>% summarise(mean = mean(los))
 16. On average, how much a 20 year-old male get charged for staying 1 day in the Fall season?
 ```{r}
 
-q16 <- df1 %>% filter(sex == 1, los == 1, age == 20, season == "fall") 
+q16 <- df1 %>%  filter(sex == 1, los == 1, age == 20, season == "fall") 
 q16 %>% summarise(mean = mean(tot))
 ```
 17. Write a paragraph to summarize the section and give your comments on the results. You could do some other calculations to support your points. 
+```{r, eval=FALSE}
+#this section was very useful in terms of us cleaning and begining to visualize the data set we are working with. After removing variables in which were missing values, we were still able to see ways in which this data can and will be used. another thing to note is as I did the required stratification I discovered interesting things with respect to comparative stratification. For example when investigating how much on average a 20 year old male spends on a one night stay which we found to be $16511.00, however what is interesting is that with respect to a female in the same position it is $9676.182. These kinds of differences are significant and should be investigated further.
+```
 
 -------
 
@@ -213,7 +216,7 @@ df1$sex1 <- case_when(df1$sex == 1 ~ 'male',df1$sex == 2 ~ 'female', df1$sex == 
 ```{r}
 df1 %>% filter(dispub92 %in% c("01","02","03","04","05","09","20","50","51","62","65","70")) %>% ggplot(aes(x = dispub92, color = sex1))+
   geom_bar()+
-  labs(title = 'Bar graph of frequency of discharges stratified by sex')
+  labs(x = "status/location of patient(Disposition)",y = "Count",title = 'Bar graph of frequency of discharges stratified by sex', caption = "The top 12 dispositions for individuals. The most frequent appears to be a Routine discharge(01) to home or self care.")
 ```
 
 ```{r}
@@ -222,7 +225,7 @@ df1 %>% ggplot() + geom_point(mapping=aes(x=age, y=los)) + facet_wrap(~sex1) +
   labs(x='Age', 
        y = 'Length of Stay', 
        title = 'Length of Stay by Age and Sex', 
-       caption = '')
+       caption = 'On average younger people seem to stay in the hospital longer than old people. It should be noted the data we see for other makes sense due to the lack of observation. ')
 
 ```
 
@@ -248,21 +251,29 @@ df1 %>% ggplot() + geom_point(mapping=aes(x=los, y=tot)) + facet_wrap(~provider1
 df1 %>% filter(age <= 20) %>% ggplot(aes(y = provider1,
            x = tot, color=sex1))+
   geom_col()+
-  labs(title = 'provider by expense by gender')
+  labs(title = 'provider by expense and gender',x = "Total expenses",y = "Provider", caption = "as observed in the scatterplot earlier we also see Woman and Infants as well as Rhode Island hospital being the most expensive. Bradley appears to work with predominantly male patients.")
 ```
 
 ```{r}
 df1 %>% ggplot(aes(x = moa,y= tot,
             color=sex1))+
   geom_col()+
-  labs(title = 'moa vs total room and board')
+  labs(title = 'moa vs total room and board', x = "Month of Admition", y = "Total expenses", caption = "August and October appear to have a higher total cost. This could be due to the increase in patients during these months.")
 ```
 
-```{r}
+```{r, eval=FALSE}
 df1 %>% ggplot(aes(x = campus,
-           y = tot, color=sex1))+
+           , color=sex1))+
+  geom_bar() 
+#this was to view frequency of individuals on campus to assist in interpreting total expenses vs campus
+```
+
+
+```{r}
+df1 %>% group_by(campus, sex1) %>% summarise(mean = mean(tot)) %>% ggplot(aes(x = campus,
+           y = mean, color=sex1))+
   geom_col()+
-  labs(title = 'total expenses by admin type')
+  labs(title = 'total expenses by Hospital campus', x = "Hospital Campus", y = "Total Expenses", caption = "The total expenses appears to be higher in campus 3 which is Rhode Island Hospital - Adult, this is important to note because the scatter plots we saw showed high expenses with respect to kids.")
 ```
 
 ```{r}
@@ -271,30 +282,31 @@ df1 %>% ggplot() + geom_point(mapping=aes(x=los, y=tot, color = sex1)) + facet_w
   labs(x='Length of Stay', 
        y = 'Total Charge', 
        title = 'Total Charge by Length of Stay and Provider', 
-       caption = '')
+       caption = 'Woman and Infants as well as Rhode Island Hospital appear to be the highest charges with the most ammount of people.')
 ```
 
 
 ```{r}
-df1 %>% filter(pt_state %in% c("MA", "RI", "CT")) %>% 
-ggplot(aes(x = pt_state,y = tot
+graph <- df1  %>% filter(pt_state %in% c("MA", "RI", "CT")) 
+graph <- graph %>% group_by(pt_state) %>% summarise(mean = mean(tot))
+graph %>% ggplot(aes(x = pt_state, y = mean
            ))+
   geom_col()+
-  labs(title = 'pysical therapy in MA, CT, RI')
+  labs(title = 'pysical therapy in MA, CT, RI', x = "Physical therapy location", y = " average total expenses", caption = "average expenses in Massachusetts appear higher than onneticut C Rhode Island")
 ```
 
-```{r}
+```{r, eval=FALSE}
 df1 %>% ggplot() + geom_col(mapping=aes(y=provider1,x = tot, fill=season)) +
   labs(x='Total Expenses', 
        y='Provider',
        fill = 'Season', 
-       title = '', 
-       caption = '')
+       title = 'Total expenses by provider and season', 
+       caption = 'Rhode Island Hospital shows the highest toal expenses.There appears minimal variation between seasons for each hospital.')
 ```
 
 2. Make an animation plot. 
 
-```{r}
+```{r,eval=FALSE}
 library(gganimate)
 library(ggplot2)
 library(tidyverse)
@@ -312,6 +324,10 @@ df1 %>% ggplot() + geom_bar(mapping = aes(x = sex, fill = trandb)) +
 
 
 3. Write a paragraph to summarize the section and give your comments on the results. 
+
+```{r,eval=FALSE}
+The graphs produced allowed for us to get a good visualization to understand how/if stratifying by season or sex allows us to better understand the positive corrected relationship between total expenses and length of stay. We saw a consistent even split between male in females for most graphs, one notable exception is Bradley hospital which had males account for more of the total expenses. 
+```
 
 -------
 
@@ -355,7 +371,7 @@ set.seed(2020)
 df2 <- df2 %>% filter(!raceethn == "")
 df2 <- drop_na(df2)
                                             
-splitIndex <- createDataPartition(df2$target, p = .10, 
+splitIndex <- createDataPartition(df2$target, p = .1, 
                                   list = FALSE)
 df_train <- df2[ splitIndex,]
 df_test <- df2[-splitIndex,]
@@ -419,9 +435,16 @@ print(tree_approach3)
 pred <- predict(tree_approach3, df_test)
 cm1 <- confusionMatrix(data = pred, reference = df_test$target)
 cm1$overall[1]
+
 ```
 
 5. What is your final selection for the model? Test the accuracy of your final model on the test data. 
+```{r}
+cm$overall[1]#original
+cm0$overall[1]#treeplot2
+cm1$overall[1]#treeplot3
+#highest accuracy appears to be my third model which was a model trained through the ranger process.
+```
 
 6. Create another `target` variable (binary), decide the input variables and redo 1 to 5. 
 
