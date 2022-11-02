@@ -295,7 +295,7 @@ graph %>% ggplot(aes(x = pt_state, y = mean
   labs(title = 'pysical therapy in MA, CT, RI', x = "Physical therapy location", y = " average total expenses", caption = "average expenses in Massachusetts appear higher than onneticut C Rhode Island")
 ```
 
-```{r, eval=FALSE}
+```{r}
 df1 %>% ggplot() + geom_col(mapping=aes(y=provider1,x = tot, fill=season)) +
   labs(x='Total Expenses', 
        y='Provider',
@@ -306,7 +306,7 @@ df1 %>% ggplot() + geom_col(mapping=aes(y=provider1,x = tot, fill=season)) +
 
 2. Make an animation plot. 
 
-```{r,eval=FALSE}
+```{r}
 library(gganimate)
 library(ggplot2)
 library(tidyverse)
