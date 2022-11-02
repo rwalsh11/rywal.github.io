@@ -14,5 +14,5 @@
 | [click for assignment 10](assignment10.html) |  |  |
 | [click for assignment 11](assignment11.html) |  |  |
 | [click for assignment 12](assignment12.html) |  |  |
-| [click for Midterm](midterm_toc2.html) |  |  |
+| [click for Midterm](midterm_toc2.html) |  | [click for presentation](midterm_presentation.html) |
 |  |  |  |

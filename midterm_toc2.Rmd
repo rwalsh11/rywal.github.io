@@ -214,51 +214,65 @@ df1$sex1 <- case_when(df1$sex == 1 ~ 'male',df1$sex == 2 ~ 'female', df1$sex == 
 
 
 ```{r}
-df1 %>% filter(dispub92 %in% c("01","02","03","04","05","09","20","50","51","62","65","70")) %>% ggplot(aes(x = dispub92, color = sex1))+
+m8 <- df1 %>% filter(dispub92 %in% c("01","02","03","04","05","09","20","50","51","62","65","70")) %>% ggplot(aes(x = dispub92, color = sex1))+
   geom_bar()+
   labs(x = "status/location of patient(Disposition)",y = "Count",title = 'Bar graph of frequency of discharges stratified by sex', caption = "The top 12 dispositions for individuals. The most frequent appears to be a Routine discharge(01) to home or self care.")
+ggsave(filename = 'Dispotion.png', plot = m8)
+m8
+
 ```
 
 ```{r}
 library(ggplot2)
-df1 %>% ggplot() + geom_point(mapping=aes(x=age, y=los)) + facet_wrap(~sex1) +
+m7 <- df1 %>% ggplot() + geom_point(mapping=aes(x=age, y=los)) + facet_wrap(~sex1) +
   labs(x='Age', 
        y = 'Length of Stay', 
        title = 'Length of Stay by Age and Sex', 
        caption = 'On average younger people seem to stay in the hospital longer than old people. It should be noted the data we see for other makes sense due to the lack of observation. ')
+m7
+ggsave(filename = 'AgevLos.png', plot = m7)
 
 ```
 
 ```{r}
-df1 %>% ggplot() + geom_point(mapping=aes(x=age, y=tot)) + facet_wrap(~sex1) +
+m6 <- df1 %>% ggplot() + geom_point(mapping=aes(x=age, y=tot)) + facet_wrap(~sex1) +
   labs(x='Age', 
        y = 'total expenses', 
-       title = 'Length of Stay by Age and total expenses', 
-       caption = '')
+       title = 'total expenses by Age and sex', 
+       caption = 'Once again we see indiviudals who are young(< 10 years old) accounting for some of our highest expenses, due to their long lenth of stay as well this makes sense that their total expenses are more.')
+ggsave(filename = 'AgevTot.png', plot = m6)
+m6
 ```
 
 ```{r}
 library(ggplot2)
-df1 %>% ggplot() + geom_point(mapping=aes(x=los, y=tot)) + facet_wrap(~provider1) +
+m5 <- df1 %>% ggplot() + geom_point(mapping=aes(x=los, y=tot)) + facet_wrap(~provider1) +
   labs(x='Length of Stay', 
        y = 'Total Charge', 
        title = 'Total Charge by Length of Stay and Provider', 
-       caption = '')
+       caption = 'Rhode Island Hospital and Woman and Infants appear to have the most data, the woman and infants appear to charge at a more extreame rate if we were to run a linear regression to predict price from length of stay')
+ggsave(filename = 'LosProv.png', plot = m5)
+m5
 ```
 
 ```{r}
 #teenagers
-df1 %>% filter(age <= 20) %>% ggplot(aes(y = provider1,
+m4 <- df1 %>% filter(age <= 20) %>% ggplot(aes(y = provider1,
            x = tot, color=sex1))+
   geom_col()+
   labs(title = 'provider by expense and gender',x = "Total expenses",y = "Provider", caption = "as observed in the scatterplot earlier we also see Woman and Infants as well as Rhode Island hospital being the most expensive. Bradley appears to work with predominantly male patients.")
+ggsave(filename = 'LosProvTeen.png', plot = m4)
+m4
 ```
 
 ```{r}
-df1 %>% ggplot(aes(x = moa,y= tot,
+m3 <- df1 %>% ggplot(aes(x = moa,y= tot,
             color=sex1))+
   geom_col()+
   labs(title = 'moa vs total room and board', x = "Month of Admition", y = "Total expenses", caption = "August and October appear to have a higher total cost. This could be due to the increase in patients during these months.")
+m3
+ggsave(filename = 'Moatrandb.png', plot = m3)
+
 ```
 
 ```{r, eval=FALSE}
@@ -270,38 +284,47 @@ df1 %>% ggplot(aes(x = campus,
 
 
 ```{r}
-df1 %>% group_by(campus, sex1) %>% summarise(mean = mean(tot)) %>% ggplot(aes(x = campus,
+m2 <- df1 %>% group_by(campus, sex1) %>% summarise(mean = mean(tot)) %>% ggplot(aes(x = campus,
            y = mean, color=sex1))+
   geom_col()+
   labs(title = 'total expenses by Hospital campus', x = "Hospital Campus", y = "Total Expenses", caption = "The total expenses appears to be higher in campus 3 which is Rhode Island Hospital - Adult, this is important to note because the scatter plots we saw showed high expenses with respect to kids.")
+m2
+ggsave(filename = 'TotbyHos.png', plot = m2)
 ```
 
 ```{r}
 
-df1 %>% ggplot() + geom_point(mapping=aes(x=los, y=tot, color = sex1)) + facet_wrap(~provider1) +
+m1 <- df1 %>% ggplot() + geom_point(mapping=aes(x=los, y=tot, color = sex1)) + facet_wrap(~provider1) +
   labs(x='Length of Stay', 
        y = 'Total Charge', 
        title = 'Total Charge by Length of Stay and Provider', 
        caption = 'Woman and Infants as well as Rhode Island Hospital appear to be the highest charges with the most ammount of people.')
+m1
+ggsave(filename = 'LosProv.png', plot = m1)
 ```
 
 
 ```{r}
 graph <- df1  %>% filter(pt_state %in% c("MA", "RI", "CT")) 
 graph <- graph %>% group_by(pt_state) %>% summarise(mean = mean(tot))
-graph %>% ggplot(aes(x = pt_state, y = mean
+m10 <- graph %>% ggplot(aes(x = pt_state, y = mean
            ))+
   geom_col()+
-  labs(title = 'pysical therapy in MA, CT, RI', x = "Physical therapy location", y = " average total expenses", caption = "average expenses in Massachusetts appear higher than onneticut C Rhode Island")
+  labs(title = 'physical therapy in MA, CT, RI', x = "physical therapy location", y = " average total expenses", caption = "The Average expenses in Massachusetts appear higher than Conneticut or Rhode Island")
+m10
+ggsave(filename = 'pysical_therapy.png', plot = m10)
 ```
 
 ```{r}
-df1 %>% ggplot() + geom_col(mapping=aes(y=provider1,x = tot, fill=season)) +
+m9 <- df1 %>% ggplot() + geom_col(mapping=aes(y=provider1,x = tot, fill=season)) +
   labs(x='Total Expenses', 
        y='Provider',
        fill = 'Season', 
-       title = 'Total expenses by provider and season', 
+       title = 'total expenses by provider and season', 
        caption = 'Rhode Island Hospital shows the highest toal expenses.There appears minimal variation between seasons for each hospital.')
+m9
+ggsave(filename = 'totvProv.png', plot = m9)
+
 ```
 
 2. Make an animation plot. 
@@ -310,17 +333,41 @@ df1 %>% ggplot() + geom_col(mapping=aes(y=provider1,x = tot, fill=season)) +
 library(gganimate)
 library(ggplot2)
 library(tidyverse)
-df1 %>% ggplot() + geom_bar(mapping = aes(x = sex, fill = trandb)) + 
+a1 <- df1 %>% ggplot() + geom_bar(mapping = aes(x = sex, fill = trandb)) + 
   transition_states(age) + 
   labs(x='Sex', 
        y='Total room and board charge',
        title = 'Age: {closest_state}')
+animate(a1,nframes = 10)
+```
 
+```{r}
+library(gganimate)
+library(ggplot2)
+df1$avgtot <- case_when(df1$tot >= 34317.18	~"above average",df1$tot <= 34317.18	~ "below average")
+d1 <- df1 %>% group_by(moa,sex1,avgtot,age) %>% summarise(mean = mean(tot))
+d2 <- d1 %>% group_by(moa) %>% mutate(rank=rank(-mean)) 
+a1 <- d2 %>% ggplot(aes(x=moa, y=mean, group=avgtot, fill=sex1, label=sex1)) + geom_col()+geom_text(aes(y = mean, label = sex1), hjust = 4)+
+    theme(plot.title = element_text(hjust = 1, size = 22),
+          axis.ticks.y = element_blank(),
+          axis.text.y  = element_blank()) + 
+    transition_states(age)+
+    ease_aes("cubic-in-out")
+animate(a1, nframes = 10)
 ```
 
 
+```{r}
+library(gganimate)
+library(ggplot2)
+df1$avgtot <- case_when(df1$tot >= 34317.18	~"above average",df1$tot <= 34317.18	~ "below average")
+df1$trandb <- as.numeric(df1$trandb)
+d1 <- df1 %>% group_by(moa,sex1,avgtot,age) %>% summarise(mean = mean(trandb, na.rm=TRUE))
 
-
+a1 <- d1 %>% ggplot(aes(x=age, y=mean, color = sex1)) + geom_col()+labs(x = "Age",y = "Average Room and Board Cost", title = 'moa {closest_state}',fill = "Sex")+
+    transition_states(moa)
+animate(a1, nframes = 400)
+```
 
 
 3. Write a paragraph to summarize the section and give your comments on the results. 

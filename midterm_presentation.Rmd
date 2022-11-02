@@ -21,14 +21,14 @@ df1$sex1 <- case_when(df1$sex == 1 ~ 'male',df1$sex == 2 ~ 'female', df1$sex == 
 ```{r,eval=FALSE}
 df1$provider1 <- case_when(df1$provider == 7201 ~ "Newport", df1$provider == 7202 ~ "St. Joseph Health Services of RI",df1$provider == 7203 ~ "Memorial",df1$provider == 7204 ~ "Miriam",df1$provider == 7205 ~ "Rhode Island Hospital",df1$provider == 7206 ~ "Roger Williams",df1$provider == 7209 ~ "South County",df1$provider == 7210 ~ "Kent County",df1$provider == 7211 ~ "Westerly",df1$provider == 7212 ~ "Rehab of RI",df1$provider == 7213 ~ "Landmark Medical Center",df1$provider == 7214 ~ "Women and Infants",df1$provider == 7215 ~ "Bradley",df1$provider == 7216 ~ "Butler",)
 ```
-
 ---
-## Count by discharge and sex
+## Slide with Bullets
 
 ![](Dispotion.png)
 ---
 ## Total Expenses by Age and Sex
- ![](AgevTot.png)
+
+![](AgevTot.png)
 ---
 ## Length of stay by age
 
@@ -37,18 +37,16 @@ df1$provider1 <- case_when(df1$provider == 7201 ~ "Newport", df1$provider == 720
 ---
 ##Length of stay and provider
 
- ![](LosProv.png)
+![](LosProv.png)
 
 ---
 ##Length of stay and provider for teenagers
 
 ![](LosProvTeen.png)
-
 ---
 ##Average total expenses by physical therapy in local states
 
 ![](pysical_therapy.png)
-
 ---
 ##Total by Hospital
 
