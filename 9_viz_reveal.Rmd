@@ -1,3 +1,22 @@
+
+---
+title: "Midterm Presentation"
+author: <font size="5"> Ryan Walsh </font>
+output:
+  xaringan::moon_reader:
+    css: [default, metropolis, metropolis-fonts]
+    lib_dir: libs
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+      slideNumberFormat: |
+        <div class="progress-bar-container">
+          <div class="progress-bar" style="width: calc(%current% / %total% * 100%);">
+          </div>
+        </div>`
+---
+
 <style>
 
 .remark-slide-content {
@@ -99,178 +118,345 @@ library(knitr)
 
 ```
 
-# Transition: <font color="black"> Reveal </font>
+# Defining sex and providers
 
-`transition_reveal`: Transition between *values* of a variable
 
-Principles:
+```{r,eval=FALSE}
+df1$sex1 <- case_when(df1$sex == 1 ~ 'male',
+                      df1$sex == 2 ~ 'female', 
+                      df1$sex == 9 ~'Other')
+```
 
--  a time variable is mapped on one of the axes
 
--  the time variable is also mapped to actual time (our clock)
+```{r,eval=FALSE}
+df1$provider1 <- case_when(df1$provider == 7201 ~ "Newport", df1$provider == 7202 ~ "St. Joseph Health Services of RI",df1$provider == 7203 ~ "Memorial",df1$provider == 7204 ~ "Miriam",df1$provider == 7205 ~ "Rhode Island Hospital",df1$provider == 7206 ~ "Roger Williams",df1$provider == 7209 ~ "South County",df1$provider == 7210 ~ "Kent County",df1$provider == 7211 ~ "Westerly",df1$provider == 7212 ~ "Rehab of RI",df1$provider == 7213 ~ "Landmark Medical Center",df1$provider == 7214 ~ "Women and Infants",df1$provider == 7215 ~ "Bradley",df1$provider == 7216 ~ "Butler",)
+```
 
 ---
-# Data
+# Dispotion by Sex
 
-```{r,  message=FALSE, warning=FALSE}
+.left-code[
+```{r, eval=FALSE}
+m8 <- df1 %>% filter(dispub92 %in% c("01","02","03","04","05","09","20","50","51","62","65","70")) %>% ggplot(aes(x = dispub92, color = sex1))+
+  geom_bar()+
+  labs(x = "status/location of patient(Disposition)",y = "Count",title = 'Bar graph of frequency of discharges stratified by sex', caption = "The top 12 dispositions for individuals. The most frequent appears to be a Routine discharge(01) to home or self care.")
+ggsave(filename = 'Dispotion.png', plot = m8)
+m8
+```
+
+
+]
+.right-plot[
+![](Dispotion.png)
+]
+
+---
+# Total Expenses by Age and Sex
+
+.left-code[
+```{r,eval=FALSE}
+m6 <- df1 %>% ggplot() + geom_point(mapping=aes(x=age, y=tot)) + facet_wrap(~sex1) +
+  labs(x='Age', 
+       y = 'total expenses', 
+       title = 'total expenses by Age and sex', 
+       caption = 'Once again we see indiviudals who are young(< 10 years old) accounting for some of our highest expenses, due to their long lenth of stay as well this makes sense that their total expenses are more.')
+ggsave(filename = 'AgevTot.png', plot = m6)
+m6
+```
+]
+.right-plot[
+![](AgevTot.png)
+]
+
+---
+# Length of stay by Age
+
+.left-code[
+```{r,eval=FALSE}
+library(ggplot2)
+m7 <- df1 %>% ggplot() + geom_point(mapping=aes(x=age, y=los)) + facet_wrap(~sex1) +
+  labs(x='Age', 
+       y = 'Length of Stay', 
+       title = 'Length of Stay by Age and Sex', 
+       caption = 'On average younger people seem to stay in the hospital longer than old people. It should be noted the data we see for other makes sense due to the lack of observation. ')
+m7
+ggsave(filename = 'AgevLos.png', plot = m7)
+```
+]
+.right-plot[
+![](AgevLos.png)
+]
+---
+# Length of stay by provider
+
+.left-code[
+```{r,eval=FALSE}
+library(ggplot2)
+m5 <- df1 %>% ggplot() + geom_point(mapping=aes(x=los, y=tot)) + facet_wrap(~provider1) +
+  labs(x='Length of Stay', 
+       y = 'Total Charge', 
+       title = 'Total Charge by Length of Stay and Provider', 
+       caption = 'Rhode Island Hospital and Woman and Infants appear to have the most data, the woman and infants appear to charge at a more extreame rate if we were to run a linear regression to predict price from length of stay')
+ggsave(filename = 'LosProv.png', plot = m5)
+m5
+```
+]
+.right-plot[
+![](LosProv.png)
+]
+---
+# Total expenses by provider and gender for teenagers
+
+.left-code[
+```{r,eval=FALSE}
+#teenagers
+m4 <- df1 %>% filter(age <= 20) %>% ggplot(aes(y = provider1,
+           x = tot, color=sex1))+
+  geom_col()+
+  labs(title = 'provider by expense and gender',x = "Total expenses",y = "Provider", caption = "as observed in the scatterplot earlier we also see Woman and Infants as well as Rhode Island hospital being the most expensive. Bradley appears to work with predominantly male patients.")
+ggsave(filename = 'LosProvTeen.png', plot = m4)
+m4
+```
+]
+.right-plot[
+![](LosProvTeen.png)
+]
+---
+# Average total expenses by physical therapy location
+
+.left-code[
+```{r,eval=FALSE}
+graph <- df1  %>% filter(pt_state %in% c("MA", "RI", "CT")) 
+graph <- graph %>% group_by(pt_state) %>% summarise(mean = mean(tot))
+m10 <- graph %>% ggplot(aes(x = pt_state, y = mean
+           ))+
+  geom_col()+
+  labs(title = 'physical therapy in MA, CT, RI', x = "physical therapy location", y = " average total expenses", caption = "The Average expenses in Massachusetts appear higher than Conneticut or Rhode Island")
+m10
+ggsave(filename = 'pysical_therapy.png', plot = m10)
+```
+]
+.right-plot[
+![](pysical_therapy.png)
+]
+---
+# Total expenses by hopsital campus
+
+.left-code[
+```{r,eval=FALSE}
+m2 <- df1 %>% group_by(campus, sex1) %>% summarise(mean = mean(tot)) %>% ggplot(aes(x = campus,
+           y = mean, color=sex1))+
+  geom_col()+
+  labs(title = 'total expenses by Hospital campus', x = "Hospital Campus", y = "Total Expenses", caption = "The total expenses appears to be higher in campus 3 which is Rhode Island Hospital - Adult, this is important to note because the scatter plots we saw showed high expenses with respect to kids.")
+m2
+ggsave(filename = 'TotbyHos.png', plot = m2)
+```
+]
+.right-plot[
+![](TotbyHos.png)
+]
+---
+# Total by Provider
+
+.left-code[
+```{r,eval=FALSE}
+m9 <- df1 %>% ggplot() + geom_col(mapping=aes(y=provider1,x = tot, fill=season)) +
+  labs(x='Total Expenses', 
+       y='Provider',
+       fill = 'Season', 
+       title = 'total expenses by provider and season', 
+       caption = 'Rhode Island Hospital shows the highest toal expenses.There appears minimal variation between seasons for each hospital.')
+m9
+ggsave(filename = 'totvProv.png', plot = m9)
+```
+]
+.right-plot[
+![](TotvProv.png)
+]
+---
+# Month of admition vs Total expenses
+
+.left-code[
+```{r,eval=FALSE}
+m3 <- df1 %>% ggplot(aes(x = moa,y= tot,
+            color=sex1))+
+  geom_col()+
+  labs(title = 'moa vs total room and board', x = "Month of Admition", y = "Total expenses", caption = "August and October appear to have a higher total cost. This could be due to the increase in patients during these months.")
+m3
+ggsave(filename = 'Moatrandb.png', plot = m3)
+```
+]
+.right-plot[
+![](Moatrandb.png)
+]
+
+---
+# Month of admition vs Total expenses
+
+.left-code[
+```{r,eval=FALSE}
+m3 <- df1 %>% ggplot(aes(x = moa,y= tot,
+            color=sex1))+
+  geom_col()+
+  labs(title = 'moa vs total room and board', x = "Month of Admition", y = "Total expenses", caption = "August and October appear to have a higher total cost. This could be due to the increase in patients during these months.")
+m3
+ggsave(filename = 'Moatrandb.png', plot = m3)
+```
+]
+.right-plot[
+![](MoaAvgTot.png)
+]
+
+---
+# Animated plot
+
+.left-code[
+```{r,eval=FALSE}
 library(gganimate)
 library(ggplot2)
+df1$avgtot <- case_when(df1$tot >= 34317.18	~"above average",df1$tot <= 34317.18	~ "below average")
+df1$trandb <- as.numeric(df1$trandb)
+d1 <- df1 %>% group_by(moa,sex1,avgtot,age) %>% summarise(mean = mean(trandb, na.rm=TRUE))
+
+a1 <- d1 %>% ggplot(aes(x=age, y=mean, color = sex1)) + geom_col()+labs(x = "Age",y = "Average Room and Board Cost", title = 'moa {closest_state}',fill = "Sex")+
+    transition_states(moa)
+animate(a1, nframes = 400)
+```
+]
+.right-plot[
+![]()
+]
+
+
+---
+# Predictive models
+
+```{r,eval=FALSE}
 library(tidyverse)
-library(lubridate)
-df <- read_csv('https://covidtracking.com/data/download/all-states-history.csv')
-df$month <- month(df$date)
+library(dplyr)
+df1$tot <- case_when(
+  df1$tot <16228	 ~ 'low',
+  TRUE ~ 'high'
+)
+df1 <- df1 %>% rename(target=tot)
+
+df1 <- df1 %>% 
+  mutate(target = as.factor(target),)
+df2 <- df1 %>% select(age,sex,raceethn,provider,moa,mod,admtype,campus, los,target)
 ```
 
+```{r,eval=FALSE}
+df2 <- df1 %>% select(age,sex,raceethn,provider,moa,mod,admtype,campus, los,target)
+```
 ---
-# Static Plot
+# Create data partition
+
+```{r,eval=FALSE}
+library(caret)
+set.seed(2020)
+df2 <- df2 %>% filter(!raceethn == "")
+df2 <- drop_na(df2)
+                                            
+splitIndex <- createDataPartition(df2$target, p = .1, 
+                                  list = FALSE)
+df_train <- df2[ splitIndex,]
+df_test <- df2[-splitIndex,]
+```
+---
+# Rpart tree
 
 .left-code[
-```{r step1281110, eval = FALSE, echo = TRUE}
-df %>% 
-  filter(state %in% c('NY')) %>% 
-  ggplot(aes(y=positive,
-            x=date))+ 
-  geom_line() #<<
+```{r,eval=FALSE}
+library(rpart)
+tree_model <- rpart(target ~ ., data = df_train,
+                 control = rpart.control(maxdepth = 3))
+library(rattle)
+fancyRpartPlot(tree_model)
+tree_model$variable.importance
+barplot(tree_model$variable.importance)
+pred <- predict(tree_model, df_test, type = "class")
+cm <- confusionMatrix(data = pred, reference = df_test$target)
+cm$overall[1]
 ```
 ]
 .right-plot[
-```{r, ref.label = "step1281110", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
-```
+
 ]
 
 ---
-# Adding transition_reveal
-
-```{r, echo=FALSE}
-df <- read_csv('https://covidtracking.com/data/download/all-states-history.csv')
-df$month <- month(df$date)
-```
-
+# Additional model 1(Rpart2)
 
 .left-code[
-```{r step12811101, eval = FALSE, echo = TRUE}
-df %>% 
-  filter(state %in% c('NY')) %>% 
-  ggplot(aes(y=positive,
-            x=date))+ 
-  geom_line()+
-  transition_reveal(date) #<<
-  
+```{r,eval=FALSE}
+library(caret)
 
-```
-]
-.right-plot[
-```{r, ref.label = "step12811101", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
-```
-]
+tuneGrid = expand.grid(maxdepth = 2:10)
 
+trControl = trainControl(method = "cv",
+                         number = 5)
 
----
-# Static Plot
-
-```{r, echo=FALSE}
-df <- read_csv('https://covidtracking.com/data/download/all-states-history.csv')
-df$month <- month(df$date)
-```
-
-
-.left-code[
-```{r step128111012, eval = FALSE, echo = TRUE}
-df %>% 
-  filter(state %in% c('NY','FL')) %>% 
-  ggplot(aes(y=positive,
-            x=date,
-            color=state))+ #<<
-  geom_line() 
-```
-]
-.right-plot[
-```{r, ref.label = "step128111012", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
-```
-]
-
-
----
-# Adding transition_reveal
-
-```{r, echo=FALSE}
-df <- read_csv('https://covidtracking.com/data/download/all-states-history.csv')
-df$month <- month(df$date)
-```
-
-
-.left-code[
-```{r step1281110121, eval = FALSE, echo = TRUE}
-df %>% 
-  filter(state %in% c('NY','FL')) %>% 
-  ggplot(aes(y=positive,
-            x=date,
-            color=state))+ 
-  geom_line()+
-  transition_reveal(date) #<<
-  
+tree_approach2 <- train(target~., data=df_train, 
+                                method = "rpart2", 
+                                trControl = trControl,
+                                tuneGrid = tuneGrid)
 
 ```
 ]
 .right-plot[
-```{r, ref.label = "step1281110121", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
-```
+
 ]
-
 ---
-# Adding transition_reveal
-
-```{r, echo=FALSE}
-df <- read_csv('https://covidtracking.com/data/download/all-states-history.csv')
-df$month <- month(df$date)
-```
-
+# Additional model 2(Ranger)
 
 .left-code[
-```{r step128111012111, eval = FALSE, echo = TRUE}
-df %>% 
-  filter(state %in% c('NY','FL')) %>% 
-  ggplot(aes(y=positive,
-            x=date,
-            color=state))+ 
-  geom_line()+
-  geom_point(size=3)+ #<<
-  transition_reveal(date) 
-  
+```{r,eval=FALSE}
+library(caret)
+tuneGrid = expand.grid(mtry = 2:4,
+                       splitrule = c('gini'),
+                       min.node.size = c(1:10))
+
+trControl = trainControl(method = "cv",
+                         number = 5)
+
+tree_approach3 <- train(target~., data=df_train, 
+                                method = "ranger", 
+                                trControl = trControl,
+                                tuneGrid = tuneGrid)
 
 ```
 ]
 .right-plot[
-```{r, ref.label = "step128111012111", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
-```
+
 ]
-
 ---
-# Adding transition_reveal
-
-```{r, echo=FALSE}
-df <- read_csv('https://covidtracking.com/data/download/all-states-history.csv')
-df$month <- month(df$date)
-```
-
+# Model comparison Rpart2
 
 .left-code[
-```{r step112811101211, eval = FALSE, echo = TRUE}
-df %>% 
-  filter(state %in% c('NY','FL')) %>% 
-  ggplot(aes(y=positive,
-            x=date,
-            color=state))+ 
-  geom_line()+
-  geom_point(size=3)+
-  geom_text(aes(label = positive), 
-            hjust = -.1, size=5) + #<<
-  transition_reveal(date)
-  
+```{r,eval=FALSE}
+plot(tree_approach2)
+print(tree_approach2)
+pred <- predict(tree_approach2, df_test)
+cm0 <- confusionMatrix(data = pred, reference = df_test$target)
+cm0$overall[1]
+```
+]
+.right-plot[
+
+]
+---
+# Model comparison Ranger
+
+.left-code[
+```{r,eval=FALSE}
+plot(tree_approach3)
+print(tree_approach3)
+pred <- predict(tree_approach3, df_test)
+cm1 <- confusionMatrix(data = pred, reference = df_test$target)
+cm1$overall[1]
 
 ```
 ]
 .right-plot[
-```{r, ref.label = "step112811101211", echo = FALSE, cache = TRUE, fig.height = 6, fig.width = 7}
-```
+
 ]
+ 

@@ -219,7 +219,6 @@ m8 <- df1 %>% filter(dispub92 %in% c("01","02","03","04","05","09","20","50","51
   labs(x = "status/location of patient(Disposition)",y = "Count",title = 'Bar graph of frequency of discharges stratified by sex', caption = "The top 12 dispositions for individuals. The most frequent appears to be a Routine discharge(01) to home or self care.")
 ggsave(filename = 'Dispotion.png', plot = m8)
 m8
-
 ```
 
 ```{r}
@@ -260,7 +259,7 @@ m5
 m4 <- df1 %>% filter(age <= 20) %>% ggplot(aes(y = provider1,
            x = tot, color=sex1))+
   geom_col()+
-  labs(title = 'provider by expense and gender',x = "Total expenses",y = "Provider", caption = "as observed in the scatterplot earlier we also see Woman and Infants as well as Rhode Island hospital being the most expensive. Bradley appears to work with predominantly male patients.")
+  labs(title = 'Total expenses by provider and gender',x = "Total expenses",y = "Provider", caption = "as observed in the scatterplot earlier we also see Woman and Infants as well as Rhode Island hospital being the most expensive. Bradley appears to work with predominantly male patients.")
 ggsave(filename = 'LosProvTeen.png', plot = m4)
 m4
 ```
@@ -272,7 +271,16 @@ m3 <- df1 %>% ggplot(aes(x = moa,y= tot,
   labs(title = 'moa vs total room and board', x = "Month of Admition", y = "Total expenses", caption = "August and October appear to have a higher total cost. This could be due to the increase in patients during these months.")
 m3
 ggsave(filename = 'Moatrandb.png', plot = m3)
+```
 
+
+```{r}
+m11 <- df1 %>%group_by(moa,sex1) %>%  summarise(mean = mean(tot)) %>% ggplot(aes(x = moa,y= mean,
+            color=sex1))+
+  geom_col()+
+  labs(title = 'moa by  Average total room and board and sex', x = "Month of Admition", y = "Total expenses", caption = "December and March appear to have a higher total cost. This could be due to the increase in patients during these months.")
+m11
+ggsave(filename = 'MoaAvgTot.png', plot = m11)
 ```
 
 ```{r, eval=FALSE}
@@ -324,12 +332,11 @@ m9 <- df1 %>% ggplot() + geom_col(mapping=aes(y=provider1,x = tot, fill=season))
        caption = 'Rhode Island Hospital shows the highest toal expenses.There appears minimal variation between seasons for each hospital.')
 m9
 ggsave(filename = 'totvProv.png', plot = m9)
-
 ```
 
 2. Make an animation plot. 
 
-```{r}
+```{r,eval=FALSE}
 library(gganimate)
 library(ggplot2)
 library(tidyverse)
@@ -341,7 +348,7 @@ a1 <- df1 %>% ggplot() + geom_bar(mapping = aes(x = sex, fill = trandb)) +
 animate(a1,nframes = 10)
 ```
 
-```{r}
+```{r,eval=FALSE}
 library(gganimate)
 library(ggplot2)
 df1$avgtot <- case_when(df1$tot >= 34317.18	~"above average",df1$tot <= 34317.18	~ "below average")

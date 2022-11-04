@@ -28,7 +28,8 @@ df1$provider1 <- case_when(df1$provider == 7201 ~ "Newport", df1$provider == 720
 ![](Dispotion.png)
 ---
 ## Total Expenses by Age and Sex
- ![](AgevTot.png)
+![](AgevTot.png)
+
 ---
 ## Length of stay by age
 
@@ -37,7 +38,7 @@ df1$provider1 <- case_when(df1$provider == 7201 ~ "Newport", df1$provider == 720
 ---
 ##Length of stay and provider
 
- ![](LosProv.png)
+![](LosProv.png)
 
 ---
 ##Length of stay and provider for teenagers
