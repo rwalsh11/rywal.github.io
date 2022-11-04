@@ -472,7 +472,6 @@ tree_approach3 <- train(target~., data=df_train,
                                 method = "ranger", 
                                 trControl = trControl,
                                 tuneGrid = tuneGrid)
-
 ```
 4. Plot the comparison of the models in 3. 
 ```{r}
@@ -494,27 +493,34 @@ cm1$overall[1]
 
 5. What is your final selection for the model? Test the accuracy of your final model on the test data. 
 ```{r}
+library(mlbench)
+library(tidyverse)
+library(caret)
 cm$overall[1]#original
 cm0$overall[1]#treeplot2
 cm1$overall[1]#treeplot3
+bwplot(resamples(list('RPart2' = tree_approach2,
+                      'Ranger' = tree_approach3
+                          )))
+
 #highest accuracy appears to be my third model which was a model trained through the ranger process.
 ```
 
 6. Create another `target` variable (binary), decide the input variables and redo 1 to 5. 
 
 ```{r}
-df1 <- df1 %>% rename(target1=los)#new target(have not established anything else)
+df1 <- df1 %>% rename(target1=sex1)#new target(have not established anything else)
 
 df1 <- df1 %>% 
   mutate(target1 = as.factor(target1),)
-df2 <- df1 %>% select(age,sex,raceethn,provider,moa,mod,admtype,campus, target1,target)
+df2 <- df1 %>% select(age,los,raceethn,provider,moa,mod,admtype,campus, target1,target)
 ```
 
 
 ```{r}
 library(caret)
 set.seed(2020) 
-df2 <- df2 %>% filter(!raceethn=='') 
+df2 <- df2 %>% filter(!raceethn=='',!admtype=='') 
 splitIndex <- createDataPartition(df2$target1, p = .10, 
                                   list = FALSE)
 df_train <- df2[ splitIndex,]
@@ -525,11 +531,20 @@ tuneGrid = expand.grid(maxdepth = 2:10)
 trControl = trainControl(method = "cv",
                          number = 5)
 
-tree_approach2 <- train(target~., data=df_train, 
+tree_approach4 <- train(target1~., data=df_train, 
                                 method = "rpart2", 
                                 trControl = trControl,
                                 tuneGrid = tuneGrid)
+plot(tree_approach4)
+print(tree_approach4)
+pred <- predict(tree_approach4, df_test)
+cm4 <- confusionMatrix(data = pred, reference = df_test$target1)
+cm4$overall[1]
+
 ```
 7. Write a paragraph to summarize the section and give your comments on the results. 
+```{r,eval=FALSE}
+During this section I focused on creating two different models, the first one based on whether an individual paid above or below the average total cost, and the second to compare between male and females. However, before I was able to run these I first had to ensure my data was in factor form and then begin to split my data.  I split the data into training and testing data and created the first tree models using 3 as the max depth. I then created two models to compare using cross-validation with 5 folds with the Ranger and Rpart2 methods. In the end it was clear that our ranger test had the highest confidence, as well as recognizing our trees had a better time predicting whether an individual paid more or less than total average than guessing an individuals gender.
 
+```
 -------

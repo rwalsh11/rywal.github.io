@@ -324,7 +324,7 @@ animate(a1, nframes = 400)
 ```
 ]
 .right-plot[
-![]()
+![](AnimatedPlot.gif)
 ]
 
 
@@ -368,7 +368,7 @@ df_test &lt;- df2[-splitIndex,]
 ---
 # Rpart tree
 
-.left-code[
+
 
 ```r
 library(rpart)
@@ -377,20 +377,27 @@ tree_model &lt;- rpart(target ~ ., data = df_train,
 library(rattle)
 fancyRpartPlot(tree_model)
 tree_model$variable.importance
+##        los    admtype        age   provider     campus raceethn 
+## 1280.12651  431.30612  419.30831  351.39954   58.83157   47.76413
 barplot(tree_model$variable.importance)
 pred &lt;- predict(tree_model, df_test, type = "class")
 cm &lt;- confusionMatrix(data = pred, reference = df_test$target)
 cm$overall[1]
 ```
-]
-.right-plot[
+---
+# Rpart tree cont.
 
-]
+
+![](impVar.png)
+---
+# Rpart tree cont.
+![](fancytree.png)
+
 
 ---
 # Additional model 1(Rpart2)
 
-.left-code[
+
 
 ```r
 library(caret)
@@ -405,14 +412,11 @@ tree_approach2 &lt;- train(target~., data=df_train,
                                 trControl = trControl,
                                 tuneGrid = tuneGrid)
 ```
-]
-.right-plot[
 
-]
 ---
 # Additional model 2(Ranger)
 
-.left-code[
+
 
 ```r
 library(caret)
@@ -428,25 +432,21 @@ tree_approach3 &lt;- train(target~., data=df_train,
                                 trControl = trControl,
                                 tuneGrid = tuneGrid)
 ```
-]
-.right-plot[
 
-]
 ---
 # Model comparison Rpart2
 
 .left-code[
 
 ```r
-plot(tree_approach2)
-print(tree_approach2)
-pred &lt;- predict(tree_approach2, df_test)
-cm0 &lt;- confusionMatrix(data = pred, reference = df_test$target)
-cm0$overall[1]
+bwplot(resamples(list('RPart2' = tree_approach2,
+                      'Ranger' = tree_approach3
+                          )))
 ```
+
 ]
 .right-plot[
-
+![](Modelcomp.png)
 ]
 ---
 # Model comparison Ranger
@@ -454,17 +454,45 @@ cm0$overall[1]
 .left-code[
 
 ```r
-plot(tree_approach3)
-print(tree_approach3)
-pred &lt;- predict(tree_approach3, df_test)
-cm1 &lt;- confusionMatrix(data = pred, reference = df_test$target)
-cm1$overall[1]
+library(caret)
+set.seed(2020) 
+df2 &lt;- df2 %&gt;% filter(!raceethn=='',!admtype=='') 
+splitIndex &lt;- createDataPartition(df2$target1, p = .10, 
+                                  list = FALSE)
+df_train &lt;- df2[ splitIndex,]
+df_test &lt;- df2[-splitIndex,]
+
+tuneGrid = expand.grid(maxdepth = 2:10)
+
+trControl = trainControl(method = "cv",
+                         number = 5)
+
+tree_approach4 &lt;- train(target1~., data=df_train, 
+                                method = "rpart2", 
+                                trControl = trControl,
+                                tuneGrid = tuneGrid)
+plot(tree_approach4)
+print(tree_approach4)
+pred &lt;- predict(tree_approach4, df_test)
+cm4 &lt;- confusionMatrix(data = pred, reference = df_test$target1)
+cm4$overall[1]
 ```
+-Accuracy 
+-0.5828897 
+]
+.right-plot[
+![](sexTree.png)
+]
+---
+# Model comparison Rpart2
+
+.left-code[
+
+
 ]
 .right-plot[
 
 ]
- 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
