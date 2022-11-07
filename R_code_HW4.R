@@ -25,11 +25,11 @@ library(readr)
 library(dbscan)
 library(cluster)
 CARS <- read_csv("cars.csv")
-colSums(CARS)
 
 # remove observations with missing values
 CARS = na.omit(CARS)
-
+ncol(CARS)
+count(CARS)
 # remove non-numeric variables, use only cars with Types SUV, Truck or Sports
 
 a = which(CARS[,3]=="Sports")
@@ -72,7 +72,7 @@ sum(eig.pca[1:4])
 # create our dimension-reduced dataset using only the number of components that we need.
 # Replace NUMBER with how many you wish to use
 
-pca.data = pca$x[,1:NUMBER]
+pca.data = pca$x[,1:2]
 
 ##################################
 ### Perform K-means clustering ###
@@ -88,7 +88,7 @@ plot(Gap, main="Gap Statistic Plot")
 
 # perform k-means by replacing K-VALUE with the number you would like to use
 #change numeric mdidle value to establish K-Value
-k.means = kmeans(pca.data, 4, nstart=25)
+k.means = kmeans(pca.data, 13, nstart=25)
 
 
 # To plot, change col = 1: K-VALUE to the number you used for K
@@ -113,7 +113,7 @@ kNNdistplot(pca.data, k=4)
 
 # perform DBSCAN by filling in your choice for EPSILON
 #vary epsilon
-density = dbscan(pca.data, minPts = 4, eps=.8)
+density = dbscan(pca.data, minPts = 4, eps=.7)
 
 # plot results
 
