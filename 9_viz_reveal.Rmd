@@ -187,7 +187,26 @@ ggsave(filename = 'AgevLos.png', plot = m7)
 ![](AgevLos.png)
 ]
 ---
-# Length of stay by provider
+# length of stay by provider
+
+.left-code[
+```{r,eval=FALSE}
+library(ggplot2)
+m5 <- df1 %>% ggplot() + geom_point(mapping=aes(x=los, y=tot)) + facet_wrap(~provider1) +
+  labs(x='Length of Stay', 
+       y = 'Total Charge', 
+       title = 'Total Charge by Length of Stay and Provider', 
+       caption = 'Rhode Island Hospital and Woman and Infants appear to have the most data, the woman and infants appear to charge at a more extreame rate if we were to run a linear regression to predict price from length of stay')
+ggsave(filename = 'LosProv.png', plot = m5)
+m5
+```
+
+]
+.right-plot[
+![](LosProv1.png)
+]
+---
+# Length of stay by provider and sex
 
 .left-code[
 ```{r,eval=FALSE}
@@ -240,7 +259,7 @@ ggsave(filename = 'pysical_therapy.png', plot = m10)
 ![](pysical_therapy.png)
 ]
 ---
-# Total expenses by hopsital campus
+# Average total expenses by hopsital campus
 
 .left-code[
 ```{r,eval=FALSE}
@@ -273,25 +292,10 @@ ggsave(filename = 'totvProv.png', plot = m9)
 .right-plot[
 ![](TotvProv.png)
 ]
----
-# Month of admition vs Total expenses
 
-.left-code[
-```{r,eval=FALSE}
-m3 <- df1 %>% ggplot(aes(x = moa,y= tot,
-            color=sex1))+
-  geom_col()+
-  labs(title = 'moa vs total room and board', x = "Month of Admition", y = "Total expenses", caption = "August and October appear to have a higher total cost. This could be due to the increase in patients during these months.")
-m3
-ggsave(filename = 'Moatrandb.png', plot = m3)
-```
-]
-.right-plot[
-![](Moatrandb.png)
-]
 
 ---
-# Month of admition vs Total expenses
+# total expenses by moa and sex
 
 .left-code[
 ```{r,eval=FALSE}
@@ -444,7 +448,7 @@ bwplot(resamples(list('RPart2' = tree_approach2,
 ![](Modelcomp.png)
 ]
 ---
-# Model comparison Ranger
+# Model with sex as target
 
 .left-code[
 ```{r,eval=FALSE}
@@ -472,19 +476,18 @@ cm4 <- confusionMatrix(data = pred, reference = df_test$target1)
 cm4$overall[1]
 
 ```
--Accuracy 
--0.5828897 
+- Accuracy 
+- 0.5828897 
 ]
 .right-plot[
 ![](sexTree.png)
 ]
 ---
-# Model comparison Rpart2
+# Conclution/Lessons learned
+- Knitting issues
 
-.left-code[
+- Being sure to train off of 10% of our data
 
+- Saving/creating plots
 
-]
-.right-plot[
-
-]
+- being able to find model methods that could work for this dataset

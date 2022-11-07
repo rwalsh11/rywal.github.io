@@ -25,6 +25,7 @@ library(readr)
 library(dbscan)
 library(cluster)
 CARS <- read_csv("cars.csv")
+colSums(CARS)
 
 # remove observations with missing values
 CARS = na.omit(CARS)

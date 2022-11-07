@@ -245,12 +245,12 @@ m6
 
 ```{r}
 library(ggplot2)
-m5 <- df1 %>% ggplot() + geom_point(mapping=aes(x=los, y=tot)) + facet_wrap(~provider1) +
+m12 <- df1 %>% ggplot() + geom_point(mapping=aes(x=los, y=tot)) + facet_wrap(~provider1) +
   labs(x='Length of Stay', 
        y = 'Total Charge', 
        title = 'Total Charge by Length of Stay and Provider', 
        caption = 'Rhode Island Hospital and Woman and Infants appear to have the most data, the woman and infants appear to charge at a more extreame rate if we were to run a linear regression to predict price from length of stay')
-ggsave(filename = 'LosProv.png', plot = m5)
+ggsave(filename = 'LosProv1.png', plot = m12)
 m5
 ```
 
@@ -268,7 +268,7 @@ m4
 m3 <- df1 %>% ggplot(aes(x = moa,y= tot,
             color=sex1))+
   geom_col()+
-  labs(title = 'moa vs total room and board', x = "Month of Admition", y = "Total expenses", caption = "August and October appear to have a higher total cost. This could be due to the increase in patients during these months.")
+  labs(title = 'moa by total expenses', x = "Month of Admition", y = "Total expenses", caption = "August and October appear to have a higher total cost. This could be due to the increase in patients during these months.")
 m3
 ggsave(filename = 'Moatrandb.png', plot = m3)
 ```
@@ -295,7 +295,7 @@ df1 %>% ggplot(aes(x = campus,
 m2 <- df1 %>% group_by(campus, sex1) %>% summarise(mean = mean(tot)) %>% ggplot(aes(x = campus,
            y = mean, color=sex1))+
   geom_col()+
-  labs(title = 'total expenses by Hospital campus', x = "Hospital Campus", y = "Total Expenses", caption = "The total expenses appears to be higher in campus 3 which is Rhode Island Hospital - Adult, this is important to note because the scatter plots we saw showed high expenses with respect to kids.")
+  labs(title = 'Average total expenses by Hospital campus', x = "Hospital Campus", y = "Total Expenses", caption = "The average total expenses appears to be higher in campus 3 which is Rhode Island Hospital - Adult, this is important to note because the scatter plots we saw showed high expenses with respect to kids.")
 m2
 ggsave(filename = 'TotbyHos.png', plot = m2)
 ```
@@ -335,35 +335,6 @@ ggsave(filename = 'totvProv.png', plot = m9)
 ```
 
 2. Make an animation plot. 
-
-```{r,eval=FALSE}
-library(gganimate)
-library(ggplot2)
-library(tidyverse)
-a1 <- df1 %>% ggplot() + geom_bar(mapping = aes(x = sex, fill = trandb)) + 
-  transition_states(age) + 
-  labs(x='Sex', 
-       y='Total room and board charge',
-       title = 'Age: {closest_state}')
-animate(a1,nframes = 10)
-```
-
-```{r,eval=FALSE}
-library(gganimate)
-library(ggplot2)
-df1$avgtot <- case_when(df1$tot >= 34317.18	~"above average",df1$tot <= 34317.18	~ "below average")
-d1 <- df1 %>% group_by(moa,sex1,avgtot,age) %>% summarise(mean = mean(tot))
-d2 <- d1 %>% group_by(moa) %>% mutate(rank=rank(-mean)) 
-a1 <- d2 %>% ggplot(aes(x=moa, y=mean, group=avgtot, fill=sex1, label=sex1)) + geom_col()+geom_text(aes(y = mean, label = sex1), hjust = 4)+
-    theme(plot.title = element_text(hjust = 1, size = 22),
-          axis.ticks.y = element_blank(),
-          axis.text.y  = element_blank()) + 
-    transition_states(age)+
-    ease_aes("cubic-in-out")
-animate(a1, nframes = 10)
-```
-
-
 ```{r}
 library(gganimate)
 library(ggplot2)
