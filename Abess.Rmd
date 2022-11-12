@@ -1,0 +1,212 @@
+---
+title: "Abess"
+author: "Ryan Walsh"
+date: "2022-11-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+R Assignment 2 (Individual) 
+
+ 
+
+Download this dataset from Canvas and use it for this assignment.  
+```{r}
+library(tidyverse)
+df <- read.csv("Abess.csv")
+```
+
+  
+
+Rename the variable “var1” to “Earning”.  
+```{r}
+names(df)[2] <- 'Earning'
+```
+
+Check whether there are any missing values in the dataset.  
+```{r}
+df %>% is.na() %>% colSums()
+```
+
+Check the “Education” variable for abnormal values. Replace those with “NA”. 
+```{r}
+table(df$Education)
+#we believe that 99 is a invalid value
+df$Education<- case_when(df$Education == 99 ~ "NA",TRUE ~ as.character(df$Education))
+
+```
+
+Check the “Earning” variable for abnormal values. Replace those with “NA”. 
+
+```{r}
+df$Earning<- case_when(df$Earning == 99 ~ "NA",TRUE ~ as.character(df$Earning))
+```
+
+Create a new dataset omitting the missing values. Use the newly created dataset for the rest of the questions. 
+```{r}
+df1 <- drop_na(df)
+df1 %>% is.na() %>% colSums()
+
+```
+
+Create a dummy variable called “Female” which equals 1 if Gender is Female, zero otherwise.  
+```{r}
+df$sex <- case_when(df$Gender == "Female" ~ 1, TRUE ~ 0)
+```
+
+Create a dummy variable called “Urban” which equals 1 if Location is Urban, zero otherwise. 
+```{r}
+df$Location1 <- case_when(df$Location == "Urban" ~ 1, TRUE ~ 0)
+
+```
+
+
+Find the mean and median earning.  
+```{r}
+df1 <- df %>% filter(!Earning == "NA")
+df1 %>% summarise(mean = mean(Earning))
+df1 %>% summarise(median = median(Earning))
+```
+
+
+Does earning vary by gender and location? Find the mean by different gender and location.  
+```{r}
+df1 %>% filter(sex==0) %>% 
+        group_by(sex,Location1,Earning) %>% 
+        summarise(mean= mean(Earning)) %>% 
+        arrange(-mean)
+
+df1 %>% filter(sex==1) %>% 
+        group_by(sex,Location1,Earning) %>% 
+        summarise(mean= mean(Earning)) %>% 
+        arrange(-mean)
+
+df1 %>% filter(Location1==0) %>% 
+        group_by(sex,Location1,Earning) %>% 
+        summarise(mean= mean(Earning)) %>% 
+        arrange(-mean)
+df1 %>% filter(Location1==1) %>% 
+        group_by(sex,Location1,Earning) %>% 
+        summarise(mean= mean(Earning)) %>% 
+        arrange(-mean)
+
+```
+
+Are the means of earning statistically different for male and female?  
+
+ 
+Are the means of education statistically different for urban and rural?  
+
+Create a scatter plot of earning and education variables. Label properly. Save the file on your computer.  
+```{r}
+gg <- df %>% 
+  ggplot()+ 
+  geom_point(aes(x=Education, y=Earning))
+ggsave(filename = 'Abess.png', plot = gg)
+
+```
+
+Add a fitted line on the previous graph.  
+```{r}
+gg1 <- df %>% 
+  ggplot()+ 
+  geom_point(aes(x=Education, y=Earning))+geom_smooth(method = "lm",se = FALSE)
+
+#ggsave(filename = 'Abess1.png', plot = gg1)
+```
+
+Are earning and education correlated? Find the correlation coefficient. Test whether the correlation statistically significant.  
+
+```{r}
+MAPE <-  function(y_actual, y_predict){
+  mean(abs((y_actual-y_predict)/y_actual))*100
+}
+RSQUARE = function(y_actual,y_predict){
+  cor(y_actual,y_predict)^2
+}
+```
+
+
+ 
+
+Run a regression for the following regression equation:  
+
+Earningi=β0+β1(Femalei)+εi
+Earningi=𝛽0+𝛽1Femalei+𝜀i
+ 
+```{r}
+library(ggplot2)
+library(dplyr)
+library(broom)
+library(ggpubr)
+
+new_df <- df %>% filter(sex==0)
+
+summary(new_df)
+new_df <- drop_na(new_df)
+#lm <- lm(Earning~sex,data=new_df)
+#summary(lm)
+```
+
+
+How would you interpret the estimated constant coefficient (
+βˆ0
+𝛽^0
+ 
+)? How does the estimated constant coefficient compare to the mean of male earning you found in (10)?   
+
+How would you interpret the estimated Female coefficient (
+βˆ1
+𝛽^1
+ 
+)? 
+
+ 
+
+Run a regression for the following regression equation:  
+
+[Equation] 
+
+How would you interpret the estimated constant coefficient ([Equation])? How does the estimated constant coefficient compare to the mean of urban earning you found in (10)?   
+
+ 
+
+Run a regression for the following regression equation:  
+
+[Equation] 
+
+How would you interpret the estimated constant coefficient ([Equation])?  
+
+How would you interpret the estimated Education coefficient ([Equation])?  
+
+ 
+
+Create an interaction term called “Education_Female” by multiplying “Education” and “Female”.  
+
+Page Break
+ 
+
+Run a regression for the following regression equation:  
+
+[Equation] 
+
+How would you interpret [Equation]?  
+
+How would you interpret [Equation]?  
+
+How would you interpret [Equation]? 
+
+How would you interpret [Equation]? 
+
+ 
+
+Get the standard error and t statistics of the estimated coefficients. Is estimated education coefficient statistically significant? 
+
+ Output your regression results in a table format in csv or txt or xls or doc. Use that output and create a publication quality result table.  
+
+ 
+
+Submit the R code file and a word file with answers to the questions (e.g., 10, 11, 14, 15, 19), graph (from 12) and table (from 21).  

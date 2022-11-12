@@ -1,0 +1,60 @@
+---
+title: "461 Final"
+author: "Ryan Walsh"
+date: "2022-11-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(dplyr)
+library(tidyverse)
+df <- readRDS("C:/Users/student/Desktop/R Math421/rywal.github.io/brooklyn_sales.rds")
+```
+
+```{r}
+#colSums(is.na(df))
+df1 <- df %>% select(-FIRM07_FLA,-EDesigNum,-ZMCode,-APPDate,-Landmark,-HistDist ,-Ext,-LtdHeight,-SPDist3,-SPDist2,-SPDist1,-Overlay2,-Overlay1,-ZoneDist4,- ZoneDist3,-ZoneDist2,-PFIRM15_FL,-OwnerType)
+#colSums(is.na(df1))
+df1 <- drop_na(df1)
+##Note that as in other uploaded datasets of NYC housing on Kaggle, many of these transactions have a sale_price of $0 or only a nominal amount far less than market value. These are likely property transfers to relatives and should be excluded from any analysis of market prices.
+df1 <- df1 %>% filter(!sale_price == 0)
+```
+
+```{r}
+library(lubridate)
+df$month = month(df$sale_date)
+
+# day of the week
+df$weekday = wday(df$sale_date)
+
+# day of the month
+df$monthday <- mday(df$sale_date)
+```
+
+```{r}
+#avg sale price is 
+df1 %>% summarise(Mean_Sale_Price = mean(sale_price))
+#790641.7
+df1 %>% summarise(Median_Sale_Price = median(sale_price))
+#485000
+#possibly skew right
+```
+
+```{r}
+summary(df1$sale_price)
+# Min.   1st Qu.  Median    Mean     3rd Qu.      Max. 
+# 1    286000    485000    790642    750000    345000000 
+df2 <- df1 %>% filter(sale_price>= 286000,sale_price<=750000)
+```
+
+```{r}
+str(df2)
+```
+
+```{r}
+write.csv(df2,"C:/Users/student/Desktop/R Math421/461Data.csv")
+```
