@@ -50,9 +50,20 @@ df$century <-case_when(df$release_year >= 2000 ~ 21, df$release_year < 2000 ~ 20
 ```{r}
 df %>% filter(century==20) %>% select(title, description) %>% 
   unnest_tokens(input = description, output = word) %>% 
-  anti_join(get_stopwords()) %>% head(10) %>%
+  anti_join(get_stopwords()) %>% head(1) %>%
   kable()
 ```
+```{r}
+df %>% filter(century == 20) %>% 
+  unnest_tokens(input = description, output = word) %>% 
+  anti_join(get_stopwords()) %>% 
+  count(century, word, sort = TRUE) %>% 
+  head(10) %>% 
+  ggplot(aes(x = n, y = reorder(word, n))) +
+  geom_col() +
+  labs(y = '', x = 'Frequency')
+```
+
 
 
   b. What are the top 10 frequent words of movies/TV Shows in the 21st century. Plot the bar chart of the frequency of these words. Plot a side-by-side bar charts to compare the most frequent words by the two centuries. 
@@ -91,7 +102,7 @@ df %>%
   
   
   b. Plot the word cloud of the words in the descriptions in the movies/TV Shows in the 21st century. 
-```{r}
+```{r,eval= FALSE}
 df %>% filter(century == 21) %>% 
     unnest_tokens(input = description, output = word) %>% 
     anti_join(get_stopwords()) %>% 
@@ -106,6 +117,16 @@ df %>% filter(century == 21) %>%
     labs(y='Relative Frequency', x ='')
 
 ```
+```{r}
+pal <- brewer.pal(8,"Dark2")
+
+df %>% filter(century == 21) %>% 
+  unnest_tokens(input = description, output = word) %>% 
+  anti_join(get_stopwords()) %>% 
+  count(word, sort = TRUE) %>%
+  with(wordcloud(word, n, random.order = FALSE, max.words = 50, colors=pal))
+```
+
 
 **4. Sentiment Analysis**
 
@@ -114,15 +135,15 @@ df %>% filter(century == 21) %>%
 df %>%
     unnest_tokens(input = description, output = word) %>% 
     anti_join(get_stopwords()) %>% 
-    count(type, word, sort = TRUE) %>%
-    group_by(type) %>% 
+    count(century, word, sort = TRUE) %>%
+    group_by(century) %>% 
     inner_join(get_sentiments("bing")) %>%
     filter(!is.na(sentiment)) %>%
     count(sentiment, sort = TRUE) %>% 
-    group_by(type) %>% 
+    group_by(century) %>% 
     mutate(n = n/sum(n)) %>% 
-    ggplot(aes(type, n, fill=sentiment))+geom_col(position = 'dodge')+
-    labs(y='Relative Frequency', x ='')
+    ggplot(aes(century, n, fill=sentiment))+geom_col(position = 'fill')+
+    labs(y='Relative Frequency', x ='Century')
 ```
   
   b. Do sentiment analysis using `nrc` and `afinn` lexicons.  Give your comments on the results.
@@ -130,17 +151,31 @@ df %>%
 df %>%
     unnest_tokens(input = description, output = word) %>% 
     anti_join(get_stopwords()) %>% 
-    count(type, word, sort = TRUE) %>%
-    group_by(type) %>% 
+    count(century, word, sort = TRUE) %>%
+    group_by(century) %>% 
     inner_join(get_sentiments("nrc")) %>%
     filter(!is.na(sentiment)) %>%
     count(sentiment, sort = TRUE) %>% 
-    group_by(type) %>% 
+    group_by(century) %>% 
     mutate(n = n/sum(n)) %>% 
-    ggplot(aes(sentiment, n, fill=type))+geom_col(position = 'fill')+
-    labs(y='Relative Frequency', x ='')
+    ggplot(aes(century, n, fill=sentiment))+geom_col(position = 'fill')+
+    labs(y='Relative Frequency', x ='Century')
 ```
 
+```{r}
+df %>%
+    unnest_tokens(input = description, output = word) %>% 
+    anti_join(get_stopwords()) %>% 
+    count(century, word, sort = TRUE) %>%
+    group_by(century) %>% 
+    inner_join(get_sentiments("nrc")) %>%
+    filter(!is.na(sentiment)) %>%
+    count(sentiment, sort = TRUE) %>% 
+    group_by(century) %>% 
+    mutate(n = n/sum(n)) %>% 
+    ggplot(aes(century, n, fill=sentiment))+geom_col(position = 'fill')+
+    labs(y='Relative Frequency', x ='Century')
+```
 ```{r}
 df %>%
     unnest_tokens(input = description, output = word) %>% 
@@ -156,6 +191,8 @@ df %>%
     ggplot(aes(type, n, fill=factor(sentiment)))+geom_col(position = 'dodge')+
     labs(y='Relative Frequency', fill = 'Sentiment', x = '')
 ```
+
+
 
 **5. Modeling**
 
