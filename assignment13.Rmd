@@ -201,6 +201,8 @@ df %>%
 library(caret)
 library(themis)
 library(textrecipes)
+library(yardstick)
+
 
 # Select data and set target 
 df <- df %>% 
@@ -251,17 +253,141 @@ df$century2 <- case_when(df$release_year >= 2000 ~ "21", df$release_year >= 1950
 
     
   Predict century2 using the descriptions. Give the accuracy and plot the confusion matrix table. (Notice that the codes for 8 should still work for this question)
+```{r}
+# Select data and set target 
+df <- df %>% 
+  mutate(target = century2) %>% 
+  select(target, description) 
+
+# Convert text data to numeric variables
+a <- recipe(target~description,
+       data = df) %>% 
+  step_tokenize(description) %>% 
+  step_tokenfilter(description, max_tokens = 50) %>% 
+  step_tfidf(description) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  step_smote(target) %>% 
+  prep()
+df <- juice(a)
+
+# Using Caret for modeling
+set.seed(2022)
+splitIndex <- createDataPartition(df$target, p = .01, 
+                                  list = FALSE)
+df_train <- df[ splitIndex,]
+df_test <- df[-splitIndex,]
+
+forest_ranger <- train(target~., data=df_train, 
+                        method = "ranger")
+
+pred <- predict(forest_ranger, df_test)
+
+cm1 <- confusionMatrix(data = pred, reference = df_test$target)
+cm1$overall[1]
+
+d = data.frame(pred = pred, obs = df_test$target)
+d %>% conf_mat(pred, obs) %>% autoplot
+```
 
 **6.** Create another categorical variable from the data and do the following
+```{r}
+df <- readr::read_csv('netflix_titles.csv')
+df$country1 <- case_when(df$country == "United States" ~"USA Movie", TRUE ~ "non USA Movie")
+```
 
     - Plot side-by-side word frequency by different categories of the newly created variable
-    
+```{r}
+
+df %>%
+  unnest_tokens(input = description, output = word) %>% 
+  anti_join(get_stopwords()) %>% 
+  count(country1, word, sort = TRUE) %>% 
+  group_by(country1) %>%
+  slice_max(n, n = 10) %>% 
+  ungroup() %>%
+  mutate(word = reorder_within(word, by = n, within = country1)) %>%
+  ggplot(aes(n, word, fill = country1)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~country1, scales = "free") +
+  labs(x = "Frequency",
+       y = NULL)+
+  scale_y_reordered() 
+```
+  
     - Plot word clouds on different categories of the newly created variable
+```{r}
+pal <- brewer.pal(8,"Dark2")
+
+df %>%
+  filter(country1=='USA Movie') %>% 
+  unnest_tokens(input = description, output = word) %>% 
+  anti_join(get_stopwords()) %>% 
+  count(word, sort = TRUE) %>%
+  with(wordcloud(word, n, random.order = FALSE, max.words = 50, colors=pal))
+```
     
+```{r}
+pal <- brewer.pal(8,"Dark2")
+
+df %>%
+  filter(!country1=='USA Movie') %>% 
+  unnest_tokens(input = description, output = word) %>% 
+  anti_join(get_stopwords()) %>% 
+  count(word, sort = TRUE) %>%
+  with(wordcloud(word, n, random.order = FALSE, max.words = 50, colors=pal))
+```
+
     - Do sentiment analysis to compare different categories of the newly created variable
-    
+```{r}
+df %>% 
+    unnest_tokens(input = description, output = word) %>% 
+    anti_join(get_stopwords()) %>% 
+    count(country1, word, sort = TRUE) %>%
+    group_by(country1) %>% 
+    inner_join(get_sentiments("bing")) %>%
+    filter(!is.na(sentiment)) %>%
+    count(sentiment, sort = TRUE) %>% 
+    group_by(country1) %>% 
+    mutate(n = n/sum(n)) %>% 
+    ggplot(aes(country1, n, fill=sentiment))+geom_col(position = 'fill')+
+    labs(y='Relative Frequency', x ='')
+```
+
     - Predict the newly created variable using the description. Give the accuracy and plot the confusion matrix table. 
-    
+```{r}
+df <- df %>% 
+  mutate(target = country1) %>% 
+  select(target, description) 
+
+# Convert text data to numeric variables
+a <- recipe(target~description,
+       data = df) %>% 
+  step_tokenize(description) %>% 
+  step_tokenfilter(description, max_tokens = 50) %>% 
+  step_tfidf(description) %>% 
+  step_normalize(all_numeric_predictors()) %>% 
+  step_smote(target) %>% 
+  prep()
+df <- juice(a)
+
+# Using Caret for modeling
+set.seed(2021)
+splitIndex <- createDataPartition(df$target, p = .02, 
+                                  list = FALSE)
+df_train <- df[ splitIndex,]
+df_test <- df[-splitIndex,]
+
+forest_ranger <- train(target~., data=df_train, 
+                        method = "ranger")
+
+pred <- predict(forest_ranger, df_test)
+
+cm2 <- confusionMatrix(data = pred, reference = df_test$target)
+cm2$overall[1]
+d = data.frame(pred = pred, obs = df_test$target)
+d %>% conf_mat(pred, obs) %>% autoplot
+```
+
 -------
 
 ### Animal Reviews Data (Optional)
