@@ -30,13 +30,13 @@ df1 <- df1 %>% filter(!sale_price == 0)
 
 ```{r}
 library(lubridate)
-df$month = month(df$sale_date)
+df1$month = month(df1$sale_date)
 
 # day of the week
-df$weekday = wday(df$sale_date)
+df1$weekday = wday(df1$sale_date)
 
 # day of the month
-df$monthday <- mday(df$sale_date)
+df1$monthday <- mday(df1$sale_date)
 ```
 
 ```{r}
@@ -49,16 +49,24 @@ df1 %>% summarise(Median_Sale_Price = median(sale_price))
 ```
 
 ```{r}
-summary(df1$sale_price)
-# Min.   1st Qu.  Median    Mean     3rd Qu.      Max. 
-# 1    286000    485000    790642    750000    345000000 
-df2 <- df1 %>% filter(sale_price>= 286000,sale_price<=750000)
+df2 <- df1 %>% filter(tax_class %in% c("2", "2A", "2B","2C"))
+
+summary(df2$sale_price)
+  #Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+  #1    190000    360000    800681    691000    169000000
+df2 <- df2 %>% filter(sale_price>=190000 ,sale_price<=691000)
 ```
 
 ```{r}
-str(df2)
+df2 %>% group_by(sale_price,tax_class) %>% summarise(mean = mean(sale_price)) %>%  ggplot(aes(x=tax_class,y =mean)) + geom_col()
 ```
 
 ```{r}
-write.csv(df2,"C:/Users/student/Desktop/R Math421/461Data.csv")
+df2 <- df2 %>% select(-CD,-CT2010,-CB2010,-OwnerName)
+#continuing to remove varaibles 
+```
+
+
+```{r}
+write.csv(df2,"C:/Users/student/Desktop/R Math421/Actual461Data.csv")
 ```
