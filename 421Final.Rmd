@@ -1,52 +1,137 @@
 ---
-title: "Themed dashboard"
+title: "Titanic - SelectInput"
 output: 
   flexdashboard::flex_dashboard:
-    theme:
-      bg: "#101010"
-      fg: "#FDF7F7" 
-      primary: "#ED79F9"
-      base_font:
-        google: Prompt
-      code_font:
-        google: JetBrains Mono
     orientation: columns
     vertical_layout: fill
+    logo: logo.png
+    source_code: embed
+    social: menu
+
+runtime: shiny
 ---
 
-```{r setup, include=FALSE}
+```{r global, include=FALSE}
+#question 3
+#question 4
+# load data in 'global' chunk so it can be shared by all users of the dashboard
 library(flexdashboard)
-# Install thematic and un-comment for themed static plots (i.e., ggplot2)
-# thematic::thematic_rmd()
+library(tidyverse)
+library(plotly)
+library(knitr)
+library(DT)
+df <- read_csv('https://bryantstats.github.io/math421/data/titanic.csv')
+df <- drop_na(df, Age) 
+df$Survived = factor(df$Survived)
+
+titanic_sex <- unique(df$Sex)
 ```
 
-Column {data-width=650 .tabset}
+{.sidebar}
+=======================================================================
+
+The sinking of the Titanic is one of the most infamous shipwrecks in history. While there was some element of luck involved in surviving, it seems some groups of people were more likely to survive than others.  Select the input for the plots. 
+
+```{r}
+#question 4
+selectInput(inputId = "sex_input", 
+            label = h2("Select Gender"),
+            choices = titanic_sex, 
+            selected = 'male')
+```
+
+```{r}
+#question 5
+checkboxGroupInput(inputId = "embarked_input", 
+                   label = h3("Embarked Location"),
+                   choices = unique(df$Embarked), 
+                   inline = TRUE,
+                   selected = 'S')
+
+```
+
+```{r}
+#question 6
+sliderInput(inputId = "fare_input",
+            label = h2("Select Fare Range"),
+            min = min(df$Fare, na.rm=TRUE),
+            max = max(df$Fare, na.rm=TRUE),
+            value= c(50, 200))
+
+```
+
+```{r}
+#Question 7 
+radioButtons(inputId = "class_input", 
+             label = h2("Select Class"),
+             choices = c(1,2,3),
+             inline = TRUE,
+             selected = 1)
+```
+
+```{r}
+#question 8
+dateRangeInput(inputId = "date_input", 
+               label = h2("Date range"), 
+               start = min(df$date), 
+               end = max(df$date),
+               min = min(df$date), 
+               max = max(df$date))
+```
+
+
+```{r}
+#quesion 9 pick 3 buttons and use!
+sliderInput(inputId = "fare_input",
+            label = h3("Fare Range"),
+            min = min(df$Fare, na.rm=TRUE),
+            max = max(df$Fare, na.rm=TRUE),
+            value= c(50, 200))
+
+selectInput(inputId = "sex_input", 
+            label = h3("Gender"),
+            choices = titanic_sex, 
+            selected = 'male')
+
+checkboxGroupInput(inputId = "embarked_input", 
+                   label = h3("Embarked Location"),
+                   choices = unique(df$Embarked), 
+                   inline = TRUE,
+                   selected = 'S')
+```
+
+Main Tab 1
+=======================================================================
+
+Column {data-width=500}
 -----------------------------------------------------------------------
 
-### Chart A
+### Density Plot
 
 ```{r}
-
+renderPlotly({
+  p1 <- df %>% 
+    filter(Sex==input$sex_input) %>% 
+    ggplot(aes(x=Age, color=Survived))+
+    geom_density()
+  ggplotly(p1)
+})
 ```
 
-### Chart B
-
-```{r}
-
-```
-
-Column {data-width=350}
+Column {data-width=500}
 -----------------------------------------------------------------------
 
-### Chart C
+### Bar Plot
 
 ```{r}
-
+renderPlotly({
+  p2 <- df %>% 
+    filter(Sex==input$sex_input) %>% 
+    ggplot(aes(x=Pclass, fill=Survived))+
+    geom_bar()
+  ggplotly(p2)
+})
 ```
 
-### Chart D
 
-```{r}
-
-```
 

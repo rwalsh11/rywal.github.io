@@ -21,11 +21,11 @@ df <- readRDS("C:/Users/student/Desktop/R Math421/rywal.github.io/brooklyn_sales
 
 ```{r}
 #colSums(is.na(df))
-df1 <- df %>% select(-FIRM07_FLA,-EDesigNum,-ZMCode,-APPDate,-Landmark,-HistDist ,-Ext,-LtdHeight,-SPDist3,-SPDist2,-SPDist1,-Overlay2,-Overlay1,-ZoneDist4,- ZoneDist3,-ZoneDist2,-PFIRM15_FL,-OwnerType)
+df1 <- df %>% select(-FIRM07_FLA,-EDesigNum,-ZMCode,-APPDate,-Landmark,-HistDist ,-Ext,-LtdHeight,-SPDist3,-SPDist2,-SPDist1,-Overlay2,-Overlay1,-ZoneDist4,- ZoneDist3,-ZoneDist2,-PFIRM15_FL,-OwnerType,-CD,-CT2010,-CB2010,-OwnerName,-borough,-Borough,-BoroCode,-zip_code,-ZipCode,-ZoneDist1,-ZoneMap,-PLUTOMapID,-SHAPE_Leng,-SHAPE_Area,-MAPPLUTO_F,-Version,-APPBBL,-TaxMap,-ZoneMap,-XCoord,-YCoord,-Sanborn,-apartment_number,-residential_units,-commercial_units,-AreaSource,-residential_units,-Tract2010,-commercial_units,-total_units,-easement,-Easements,-SanitBoro,-SanitSub,-SanitDistr,-LotFront,-LotDepth,-BldgFront,-BldgDepth,-ProxCode,-IrrLotCode,-tax_class_at_sale,-CondoNo,-BBL,-BuiltFAR,-ResidFAR,-FacilFAR,-CommFAR,-LotArea,-LandUse,-BldgArea,-ComArea,-ResArea,-OfficeArea,-RetailArea,-GarageArea,-StrgeArea,-FactryArea,-OtherArea,-NumBldgs,-SplitZone,-year_built)
 #colSums(is.na(df1))
 df1 <- drop_na(df1)
 ##Note that as in other uploaded datasets of NYC housing on Kaggle, many of these transactions have a sale_price of $0 or only a nominal amount far less than market value. These are likely property transfers to relatives and should be excluded from any analysis of market prices.
-df1 <- df1 %>% filter(!sale_price == 0)
+df1 <- df1 %>% filter(!sale_price == 0,!YearBuilt == 0)
 ```
 
 ```{r}
@@ -49,20 +49,28 @@ df1 %>% summarise(Median_Sale_Price = median(sale_price))
 ```
 
 ```{r}
-df2 <- df1 %>% filter(tax_class %in% c("2", "2A", "2B","2C"))
-
+df2 <- df1 %>% filter(building_class_category %in% c("01 ONE FAMILY HOMES","02 TWO FAMILY HOMES","03 THREE FAMILY HOMES"))
+#tax_class %in% c("2", "2A", "2B","2C")
 summary(df2$sale_price)
-  #Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
-  #1    190000    360000    800681    691000    169000000
-df2 <- df2 %>% filter(sale_price>=190000 ,sale_price<=691000)
+#df4 <- df2 %>% filter(year_built %in% c(1380,1800))
+df2 <- df2 %>% filter(sale_price>=355000, sale_price<=740000)
+df2 <- df2 %>% filter(NumFloors %in% c(1,2,3,4,5,6),lot <= 50,land_sqft<=5000,gross_sqft<=8000,UnitsRes <= 6,UnitsTotal<=12,AssessLand<= 30000,AssessTot<=100000,ExemptLand<=6000,ExemptTot<=10000,YearBuilt>=1801)
+
+df2$Reno <- case_when(df2$YearAlter1 == 0 ~ "no renovation",df2$YearAlter1 <= 1990 ~"old renovation", df2$YearAlter1 >= 1990 ~"new renovation")
+df2$Reno <- case_when(df2$YearAlter2 == 0 ~ "no renovation",df2$YearAlter2 <= 1990 ~"old renovation", df2$YearAlter2 >= 1990 ~"new renovation")
+df2 <- df2 %>% select(-YearAlter1,-YearAlter2)
 ```
 
 ```{r}
-df2 %>% group_by(sale_price,tax_class) %>% summarise(mean = mean(sale_price)) %>%  ggplot(aes(x=tax_class,y =mean)) + geom_col()
+df2 %>% group_by(sale_price,neighborhood) %>% summarise(mean = mean(sale_price)) %>%  ggplot(aes(x=neighborhood,y =mean)) + geom_col()
+```
+```{r}
+df2 %>% ggplot(aes(x = land_sqft)) + geom_bar()
 ```
 
+
 ```{r}
-df2 <- df2 %>% select(-CD,-CT2010,-CB2010,-OwnerName)
+#df2 <- df2 %>% select()
 #continuing to remove varaibles 
 ```
 

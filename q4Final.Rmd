@@ -1,0 +1,73 @@
+
+---
+title: "Titanic - SelectInput"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    logo: logo.png
+    source_code: embed
+    social: menu
+
+runtime: shiny
+---
+
+```{r global, include=FALSE}
+# load data in 'global' chunk so it can be shared by all users of the dashboard
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(knitr)
+library(DT)
+df <- read_csv('diabetes.csv')
+df$preg <- case_when(df$Pregnancies >= 1 ~ "Has been Pregnant",TRUE ~"Never been pregnant")
+df$Outcome = factor(df$Outcome)
+
+preg<- unique(df$preg)
+```
+
+{.sidebar}
+=======================================================================
+
+The sinking of the Titanic is one of the most infamous shipwrecks in history. While there was some element of luck involved in surviving, it seems some groups of people were more likely to survive than others.  Select the input for the plots. 
+
+```{r}
+selectInput(inputId = "pregnancy_input", 
+            label = h3("Select pregnancy status"),
+            choices = preg, 
+            selected = 'Has been Pregnant')
+```
+
+
+Main Tab 1
+=======================================================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Density Plot
+
+```{r}
+renderPlotly({
+  p1 <- df %>% 
+    filter(preg==input$pregnancy_input) %>% 
+    ggplot(aes(x=Age, color=preg))+
+    geom_density()
+  ggplotly(p1)
+})
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Bar Plot
+
+```{r}
+renderPlotly({
+  p2 <- df %>% 
+    filter(preg==input$pregnancy_input) %>% 
+    ggplot(aes(x=Age, y = Insulin,fill=preg))+
+    geom_col()
+  ggplotly(p2)
+})
+```

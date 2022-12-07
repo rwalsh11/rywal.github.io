@@ -1,0 +1,94 @@
+---
+title: "Titanic"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    logo: logo.png
+    source_code: embed
+    social: menu
+---
+
+```{r setup, include=FALSE}
+#question 2 for final!
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(knitr)
+library(DT)
+df <- read_csv('diabetes.csv')
+
+# Create a ggplot object
+
+```
+
+#  {.sidebar}
+
+### main sidebar heading
+
+
+The sinking of the Titanic is one of the most infamous shipwrecks in history. While there was some element of luck involved in surviving, it seems some groups of people were more likely to survive than others.
+
+
+# Main Tab 1
+
+## Column {.tabset data-width="500,"}
+
+### plot 1
+```{r}
+df %>% group_by(Outcome) %>% 
+  ggplot()+
+  geom_bar(mapping=aes(x=Age, fill=Outcome), 
+           )+
+  labs(y='Proportion', fill='Outcome')
+```
+
+
+### Column Tab 2 Dataset
+
+```{r}
+datatable(df, options = list(
+  pageLength = 25
+))
+```
+
+## Column {data-width="500"}
+
+### Row 1
+
+```{r}
+df %>% 
+  mutate(Outcome = factor(Outcome)) %>% 
+  ggplot()+ 
+  geom_bar(mapping=aes(x=Age, fill=Outcome), 
+           position = 'fill')+
+  labs(y='Proportion', fill='Outcome')
+```
+
+
+# Main Tab 2
+
+## Column {data-width="500"}
+
+#### maintab 2 graph
+
+```{r}
+
+df %>% 
+  mutate(Outcome = factor(Outcome)) %>% 
+  ggplot()+ 
+  geom_density(mapping=aes(x=Age, color=Outcome))
+```
+
+
+## Column {data-width="500"}
+
+### Row 1
+
+
+# Main Tab 3
+
+```{r}
+df %>% group_by(Outcome) %>% ggplot(aes(x=Age, y = Glucose)) + facet_wrap(~Outcome)+ geom_point()
+```
+

@@ -1,0 +1,76 @@
+
+---
+title: "Titanic - Check Box"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    logo: logo.png
+    source_code: embed
+    social: menu
+
+runtime: shiny
+---
+
+```{r global, include=FALSE}
+# load data in 'global' chunk so it can be shared by all users of the dashboard
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(knitr)
+library(DT)
+library(lubridate)
+df <- read_csv('Actual461Data.csv')
+df <- drop_na(df)
+df$date <- ymd(df$sale_date)
+```
+
+{.sidebar}
+=======================================================================
+
+- The sinking of the Titanic is one of the most infamous shipwrecks in history. While there was some element of luck involved in surviving, it seems some groups of people were more likely to survive than others.  Select the input for the plots. 
+
+- In this example, the data for Date is not fictional and not real data. 
+
+```{r}
+dateRangeInput(inputId = "date_input", 
+               label = h2("Date range"), 
+               start = min(df$date), 
+               end = max(df$date),
+               min = min(df$date), 
+               max = max(df$date))
+```
+
+Main Tab 1
+=======================================================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Density Plot
+
+```{r}
+df$salecat <-  case_when(df$sale_price >= 527431 ~"above average sale",TRUE~"below average sale")
+renderPlotly({
+  p1 <- df %>% 
+    filter(date > input$date_input[1], date < input$date_input[2])%>%  
+    ggplot(aes(x=NumFloors,fill =salecat))+
+    geom_bar()
+  ggplotly(p1)
+})
+```
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Bar Plot
+
+```{r}
+renderPlotly({
+  p2 <- df %>% 
+    filter(date > input$date_input[1], date < input$date_input[2]) %>% 
+    ggplot(aes(x =Reno,fill=salecat)+
+    geom_col()
+  ggplotly(p2)
+})
+```
