@@ -1,0 +1,20 @@
+---
+title: "FinalProject"
+author: "Ryan Walsh"
+date: "2022-12-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Final project links!
+
+[Click for question 4](q4Final.html)
+[Click for question 5](q5Final.html)
+[Click for question 6](q6Final.html)
+[Click for question 7](q7Final.html)
+[Click for question 8](q8Final.html)
+[Click for question 9](q9Final.html)
+[Click for question 10](q10Final.html)
