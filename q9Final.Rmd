@@ -131,13 +131,16 @@ renderPlotly({
 Column {data-width=500}
 -----------------------------------------------------------------------
 
-### What is Density Plot?
+### Diabetes data set
 
-- A density plot is an alternative to Histogram used for visualizing the distribution of a continuous variable. The peaks of a Density Plot help to identify where values are concentrated over the interval of the continuous variable. Compared to Histograms, Density Plots are better at finding the distribution shape because they are re not affected by the number of bins used (each bar used in a typical histogram).
+```{r}
+datatable(df, options = list(
+  pageLength = 25
+))
+```
 
-- For example, a Histogram with only 4 bins wouldn’t produce a distinguishable enough shape of distribution as a 30-bin Histogram would. However, with Density Plots, this isn’t an issue.
 
-![](https://datavizcatalogue.com/methods/images/top_images/SVG/density_plot.svg)
+
 
 
 
