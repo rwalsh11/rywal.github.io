@@ -5,9 +5,9 @@ account: rywal1
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 7842903
-bundleId: 6607798
+bundleId: 6607909
 url: https://rywal1.shinyapps.io/q2Final/
-when: 1670458627.35433
-lastSyncTime: 1670458627.35434
+when: 1670460789.29591
+lastSyncTime: 1670460789.29592
 asMultiple: FALSE
 asStatic: FALSE

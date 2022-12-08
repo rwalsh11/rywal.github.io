@@ -1,5 +1,5 @@
 ---
-title: "Titanic - SelectInput"
+title: "Final project question 1"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns

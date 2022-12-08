@@ -35,46 +35,56 @@ preg<- unique(df$preg)
 {.sidebar}
 =======================================================================
 
-The sinking of the Titanic is one of the most infamous shipwrecks in history. While there was some element of luck involved in surviving, it seems some groups of people were more likely to survive than others.  Select the input for the plots. 
-
 
 ```{r}
-#tab 1
 sliderInput(inputId = "Age_input",
-            label = h2("Select Age Range"),
+            label = h2("Select Age Range for tabs 1 & 2"),
             min = min(df$Age, na.rm=TRUE),
             max = max(df$Age, na.rm=TRUE),
             value= c(21, 81))
+```
 
-
-
-radioButtons(inputId = "pregnancy_input", 
-             label = h2("Select Pregnancy status"),
-             choices = c("Has been Pregnant","Above Average Pregnancies","Never been pregnant"),
-             inline = TRUE,
-             selected = "Never been pregnant")
-#tab 2
+```{r}
+#tab 1
 checkboxGroupInput(inputId = "pregnancy_input2", 
-                   label = h3("Select pregnancy status"),
+                   label = h3("Select pregnancy status for main tab 1"),
                    choices = preg, 
                    inline = TRUE,
                    selected = 'Has been Pregnant')
 
+
+
+
+```
+
+```{r}
+
 selectInput(inputId = "outcome_input", 
-            label = h4("Select dibetets outcome"),
+            label = h4("Select dibetets outcome for main tab 2"),
             choices = df$out, 
             selected = "no diabetes")
 
-#tab 3
+radioButtons(inputId = "pregnancy_input", 
+             label = h2("Select Pregnancy status for main tab 2"),
+             choices = c("Has been Pregnant","Above Average Pregnancies","Never been pregnant"),
+             inline = TRUE,
+             selected = "Never been pregnant")
+```
 
+
+
+
+
+```{r}
 dateRangeInput(inputId = "date_input", 
-               label = h4("Date range"), 
+               label = h4("Date range for main tab 3"), 
                start = min(df1$date), 
                end = max(df1$date),
                min = min(df1$date), 
                max = max(df1$date))
-
 ```
+
+
 
 Main Tab 1
 =======================================================================
@@ -99,13 +109,13 @@ renderPlotly({
 ```{r}
 renderPlotly({
   p1 <- df %>% filter(Age>input$Age_input[1], Age<input$Age_input[2]) %>% 
-    filter(preg==input$pregnancy_input) %>% 
+    filter(preg==input$pregnancy_input2) %>% 
     ggplot(aes(x=Age, color=preg))+
     geom_density()
   ggplotly(p1)
 })
 ```
-### column tab 2 
+### Diabetes dat
 ```{r}
 datatable(df, options = list(
   pageLength = 25
@@ -140,7 +150,7 @@ Column {data-width=500}
 ```{r}
 renderPlotly({
   p2 <- df %>% filter(Age>input$Age_input[1], Age<input$Age_input[2]) %>% 
-    filter(out==input$outcome_input) %>% filter(preg==input$pregnancy_input2) %>% 
+    filter(out==input$outcome_input) %>% filter(preg==input$pregnancy_input) %>% 
     ggplot(aes(x=Age,fill=preg))+
     geom_density()
   ggplotly(p2)
@@ -150,7 +160,7 @@ renderPlotly({
 Column {data-width=500}
 -----------------------------------------------------------------------
 
-### What is Density Plot?
+### Bar plot
 
 ```{r}
 renderPlotly({
@@ -161,10 +171,6 @@ renderPlotly({
   ggplotly(p2)
 })
 ```
-
-
-
-
 
 Main Tab 3
 =======================================================================
@@ -189,9 +195,14 @@ renderPlotly({
 Column {data-width=500}
 -----------------------------------------------------------------------
 
-### Text paragraph and image!
+### brooklyn housing data
 
-this is example text about how luke is bad at chess
+#### About Dataset
+
+This is the dataset I am currently using in my 461 applied multivariate statistics project. This dataset is composed of the interquartile rangem with respect to sale price of 1 2 and 3 family homes located in Brooklyn New York City. This data set will be used to apply my knowledge in multivariate statistics through the application of statistical processes such as factor analysis PCA and then apply our dataset to models such as GLMs. This data set was created and uploaded by TOMMY WU on kaggle and his goal with the unwrangled data I worked with to get the current data set is as follows "I'm trying to make a Choropleth map over time of home sale prices by block in Brooklyn for the last 15 years to visualize gentrification. I have the entire dataset for all 5 boroughs of New York, but am starting with Brooklyn."
+
+
+
 
 
 
