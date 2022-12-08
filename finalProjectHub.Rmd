@@ -10,11 +10,20 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ## Final project links!
+- [Click for question 1](https://rywal1.shinyapps.io/q1Final/)
 
-[Click for question 4](q4Final.html)
-[Click for question 5](q5Final.html)
-[Click for question 6](q6Final.html)
-[Click for question 7](q7Final.html)
-[Click for question 8](q8Final.html)
-[Click for question 9](q9Final.html)
-[Click for question 10](q10Final.html)
+- [Click for question 2](https://rywal1.shinyapps.io/q2Final/)
+
+- [Click for question 4](https://rywal1.shinyapps.io/q4Final/)
+
+- [Click for question 5](https://rywal1.shinyapps.io/q5Final/)
+
+- [Click for question 6](https://rywal.shinyapps.io/q6Final/)
+
+- [Click for question 7](https://rywal.shinyapps.io/q7Final/)
+
+- [Click for question 8](https://rywal.shinyapps.io/q8Final/)
+
+- [Click for question 9](https://rywal.shinyapps.io/q9Final/)
+
+- [Click for question 10](https://rywal.shinyapps.io/q10Final/)

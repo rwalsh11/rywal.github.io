@@ -66,11 +66,16 @@ Column {data-width=500}
 ### Bar Plot
 
 ```{r}
+df$salecat <-  case_when(df$sale_price >= 527431 ~"above average sale",TRUE~"below average sale")
+df$meansqrtft <- mean(df$gross_sqft)
 renderPlotly({
   p2 <- df %>% 
-    filter(date > input$date_input[1], date < input$date_input[2]) %>% 
-    ggplot(aes(x =Reno,fill=salecat)+
+    filter(date > input$date_input[1], date < input$date_input[2]) %>%  
+    ggplot(aes(x = Reno, y = meansqrtft, fill=salecat))+
     geom_col()
+    
   ggplotly(p2)
 })
+  
+  
 ```
